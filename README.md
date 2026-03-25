@@ -14,9 +14,3 @@ npx skills@latest add schematify/skills --all
 
 - **schematify-generate** — Generate a Schematify graph document from a project, codebase, or user-defined description. Handles intent disambiguation, interchange format assembly, conversion, and push to server.
 
-### Install individually
-
-```
-npx skills@latest add schematify/skills/schematify-cli
-npx skills@latest add schematify/skills/schematify-generate
-```
