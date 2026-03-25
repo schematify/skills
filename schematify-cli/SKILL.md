@@ -11,7 +11,7 @@ description: Operate the schematify CLI tool. Use whenever the user mentions sch
 
 Before using the CLI, confirm `schematify` is accessible by trying to run it (e.g. `schematify --version`). If that fails, check common locations like `~/.local/bin/schematify` or `./node_modules/.bin/schematify`.
 
-If the binary cannot be found anywhere, tell the user the CLI is not installed or not on their PATH and ask how they'd like to proceed. If working inside the schematify monorepo, it can be run from source with `npm run dev -- <args>` in `apps/cli/`.
+If the binary cannot be found anywhere, tell the user the CLI is not installed or not on their PATH and ask how they'd like to proceed.
 
 ## Discovering commands and options
 
