@@ -4,9 +4,11 @@ A collection of agent skills for [Schematify](https://schematify.com) — the re
 
 ## Install all skills
 
+```bash
+npx skills@latest add schematify/skills --skill '*'
 ```
-npx skills@latest add schematify/skills --all
-```
+
+This installs all Schematify skills while still prompting you to choose the agent harness and whether to install globally or for the current project.
 
 ## Skills
 
