@@ -29,4 +29,10 @@ Run the relevant help command first, read the output, then construct the invocat
 
 **YOU MUST** Use `--json` on any command where you need to parse the output. This emits structured JSON on stdout and suppresses all human UX (spinners, colors, hints). Errors in JSON mode produce `{ "error": "...", "details": "..." }` on stdout.
 
-For commands that perform actions (push, delete, patch), rely on the exit code: 0 = success, 1 = failure.
+For commands that perform actions (push, delete, publish), rely on the exit code: 0 = success, 1 = failure.
+
+## Building graphs
+
+Graphs are authored as **TypeScript** and executed with `schematify run <script>` (the script builds a graph and can publish live channel data). For writing or running those scripts, use the **schematify-graphs** skill; to derive a graph from a codebase or dataset, use **schematify-generate**.
+
+`schematify run` is capture-by-default — it does not write to the server unless you pass `--live`. Confirm flag behavior with `schematify run --help` before running.
