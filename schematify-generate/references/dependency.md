@@ -1,6 +1,6 @@
 # Code Dependency Graph — Reconnaissance and Identification
 
-Produce a file-level dependency graph where **every source file is a node** and **every import/require/include is a link**.
+Produce a file-level dependency graph where **every source file is a node** and **every internal import/require/include is a link**. The output is a **plan** (nodes + links) that you author with the schematify-graphs builder.
 
 ## Reconnaissance
 
@@ -24,54 +24,43 @@ Delegate to a subagent where possible.
 > - For each file: resolved imports (mapped to relative file paths, not package names)
 > - Path aliases or module resolution rules discovered (e.g. `@/` → `src/`)
 > - Entry points identified
->
-> Do NOT produce interchange JSON.
 
 ## Identifying nodes
 
-One node per source file. Create `folder` nodes for directory containment.
+One node per source file, plus container nodes for directories.
 
-- **ID:** File's relative path from project root (`src/utils/auth.ts`)
-- **Label:** Filename without extension (`auth`)
-- **parentId:** Parent directory node ID
+- **ID:** file's relative path from project root (`src/utils/auth.ts`); directories use the directory path (`src/utils`).
+- **Label:** filename without extension (`auth`).
+- **Hierarchy:** nest each file/directory node inside its parent directory node via `.children([...])`.
 
-**ID conventions:** File paths relative to project root, forward slashes. Directory nodes use directory path (`src/utils`), file nodes use full relative path (`src/utils/auth.ts`).
+**Suggested node types:** a folder/group type for directories, a file type for files.
 
-**Node types for this mode:** `folder`, `file`.
+### Example plan
 
-### Example
-
-```json
-[
-  { "id": "src", "label": "src", "type": "folder" },
-  { "id": "src/index.ts", "parentId": "src", "label": "index", "type": "file" },
-  { "id": "src/utils", "parentId": "src", "label": "utils", "type": "folder" },
-  { "id": "src/utils/auth.ts", "parentId": "src/utils", "label": "auth", "type": "file" },
-  { "id": "src/utils/http.ts", "parentId": "src/utils", "label": "http", "type": "file" }
-]
+```
+- src (folder)
+  - index.ts (file)
+  - utils (folder)
+    - auth.ts (file)
+    - http.ts (file)
 ```
 
 ## Mapping links
 
-Every resolved internal import becomes a link.
+Every resolved **internal** import becomes a link.
 
-- `fromId` is the file containing the import statement
-- `toId` is the file being imported
-- Only **internal** imports (file-to-file within the project). Exclude external packages (`lodash`, `react`, `scala.collection`, etc.)
-- If an import resolves to a directory index (`import from "./utils"` → `./utils/index.ts`), link to the resolved file
+- Source = the file containing the import; target = the file being imported (use the node's full path).
+- **Only internal** file-to-file imports. Exclude external packages (`lodash`, `react`, `scala.collection`, etc.).
+- If an import resolves to a directory index (`import from "./utils"` → `./utils/index.ts`), link to the resolved file.
 
-**Link types for this mode:** `imports` only.
+### Example links
 
-### Example
-
-```json
-[
-  { "fromId": "src/index.ts", "toId": "src/utils/auth.ts", "type": "imports" },
-  { "fromId": "src/index.ts", "toId": "src/utils/http.ts", "type": "imports" },
-  { "fromId": "src/utils/auth.ts", "toId": "src/utils/http.ts", "type": "imports" }
-]
+```
+src/index.ts      → src/utils/auth.ts
+src/index.ts      → src/utils/http.ts
+src/utils/auth.ts → src/utils/http.ts
 ```
 
-Set `metadata.source` to `"dependency"`.
+Large repos produce large graphs — this is expected for dependency mode.
 
-**Return to the generate skill for interchange assembly, convert, and push.**
+**Return to the schematify-generate skill (Step 3) to author the plan with schematify-graphs.**

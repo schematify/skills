@@ -1,6 +1,6 @@
 # Architecture Diagram — Reconnaissance and Identification
 
-Produce a conceptual "whiteboard-style" architecture diagram — logical components and their relationships, **not** a file listing.
+Produce a conceptual "whiteboard-style" architecture diagram — logical components and their relationships, **not** a file listing. The output of this recipe is a **plan** (nodes + links) that you author with the schematify-graphs builder.
 
 ## Reconnaissance
 
@@ -23,56 +23,43 @@ Delegate to a subagent where possible.
 > - Logical components: name, purpose, type, corresponding directories/files
 > - Observed relationships: which components call, import, or depend on which others
 > - Grouping or layering (e.g. "frontend" containing "web-app" and "admin-panel")
->
-> Do NOT produce interchange JSON.
 
 ## Identifying nodes
 
 Each node is a logical component, not a file.
 
-- **Group related files** into single nodes. `src/auth/login.ts`, `src/auth/logout.ts`, `src/auth/token.ts` → one `auth` node (type: `module`). A PostgreSQL connection → one `database` node.
-- Use `parentId` for containment (e.g. `routes` module inside an `api` service).
+- **Group related files** into single nodes. `src/auth/login.ts`, `src/auth/logout.ts`, `src/auth/token.ts` → one `auth` node. A PostgreSQL connection → one `database` node.
+- Use **nesting** for containment (e.g. a `routes` module inside an `api` service) — express it with `.children([...])` when authoring.
 - Think whiteboard, not file tree.
 
-**ID conventions:** Use descriptive, role-based IDs — `auth-service`, `api-gateway`, `user-database`, `frontend/web-app`. Forward slashes for hierarchy. No file paths.
+**ID conventions:** descriptive, role-based ids — `auth-service`, `api-gateway`, `user-database`. Unique among siblings.
 
-**Node types for this mode:** `service`, `module`, `database`, `endpoint`, `folder`.
+**Suggested node types:** service, module, database, endpoint, and grouping/folder containers. Use texture-pack ids the project uses (e.g. `microservices/service`, `microservices/database`); fall back to a sensible generic type when unsure.
 
-### Example
+### Example plan
 
-```json
-[
-  { "id": "frontend", "label": "Frontend", "type": "folder" },
-  { "id": "frontend/web-app", "parentId": "frontend", "label": "Web App", "type": "module" },
-  { "id": "backend", "label": "Backend", "type": "folder" },
-  { "id": "backend/api", "parentId": "backend", "label": "API Gateway", "type": "service" },
-  { "id": "backend/auth", "parentId": "backend", "label": "Auth Service", "type": "service" },
-  { "id": "database", "label": "Database", "type": "database" }
-]
+```
+- frontend (group)
+  - web-app  (module)
+- backend (group)
+  - api      (service)
+  - auth     (service)
+- database   (database)
 ```
 
 ## Mapping links
 
-Links show how components communicate and depend on each other. They are **required**.
+Links show how components communicate and depend on each other. They are **required** — aim for the major communication paths, not every import.
 
-- `calls` — HTTP calls, RPC, message passing, event emission
-- `depends_on` — runtime dependency, database connection, config dependency
-- `imports` — code-level imports between modules
+- A call/HTTP/RPC/event path, a runtime/config dependency, or a key code import.
+- Express each as a link on the source node to the target's path (`.links(["backend/api"])`).
 
-Aim for the major communication paths. You don't need every import, but you need the structural relationships that define the architecture.
+### Example links
 
-**Link types for this mode:** `calls`, `depends_on`, `imports`.
-
-### Example
-
-```json
-[
-  { "fromId": "frontend/web-app", "toId": "backend/api", "type": "calls" },
-  { "fromId": "backend/api", "toId": "backend/auth", "type": "calls" },
-  { "fromId": "backend/auth", "toId": "database", "type": "depends_on" }
-]
+```
+web-app  → backend/api
+api      → backend/auth
+auth     → database
 ```
 
-Set `metadata.source` to `"architecture"`.
-
-**Return to the generate skill for interchange assembly, convert, and push.**
+**Return to the schematify-generate skill (Step 3) to author the plan with schematify-graphs.**
