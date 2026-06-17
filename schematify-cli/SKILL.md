@@ -1,38 +1,22 @@
 ---
 name: schematify-cli
-description: Operate the schematify CLI tool. Use whenever the user mentions schematify, graphs, schemas, diagrams, documents, listing graphs, pushing, pulling, deleting, patching, generating, or any schematify-related task. Always run the CLI binary rather than searching the filesystem.
+description: Operate the schematify CLI for schematify resources — graphs, schemas, diagrams, documents (list, push, pull, delete, publish, generate). Run the CLI rather than searching the filesystem.
 ---
 
 # Schematify CLI
 
-**Always use the `schematify` CLI to answer questions about schematify resources (graphs, schemas, documents, diagrams).** Never search the filesystem or codebase for schematify data — the CLI is the source of truth.
+`schematify` is a self-contained compiled binary (closed source — not an npm package, never in `node_modules`). It is the source of truth for schematify resources: query it rather than grepping the filesystem or codebase. If it is not on PATH, tell the user it is not installed and ask how to proceed.
 
-## Finding the binary
-
-Before using the CLI, confirm `schematify` is accessible by trying to run it (e.g. `schematify --version`). If that fails, check common locations like `~/.local/bin/schematify` or `./node_modules/.bin/schematify`.
-
-If the binary cannot be found anywhere, tell the user the CLI is not installed or not on their PATH and ask how they'd like to proceed.
-
-## Discovering commands and options
-
-**Never invent or guess flags, options, or arguments.** Only use what the CLI's built-in help reports. If a flag isn't in the help output, it doesn't exist.
+Discover commands and flags from the CLI's own help — never guess. If a flag isn't in `--help`, it doesn't exist.
 
 ```bash
 schematify --help
 schematify <command> --help
-schematify <command> <subcommand> --help
 ```
 
-Run the relevant help command first, read the output, then construct the invocation using only the documented flags.
+- `--json` — use whenever you need to parse output. Emits structured JSON and suppresses spinners/colors/hints; errors become `{ "error": "...", "details": "..." }` on stdout.
+- Action commands (push, delete, publish) report success via exit code: 0 = ok, 1 = fail.
 
-## Machine-readable output
+## Authoring graphs
 
-**YOU MUST** Use `--json` on any command where you need to parse the output. This emits structured JSON on stdout and suppresses all human UX (spinners, colors, hints). Errors in JSON mode produce `{ "error": "...", "details": "..." }` on stdout.
-
-For commands that perform actions (push, delete, publish), rely on the exit code: 0 = success, 1 = failure.
-
-## Building graphs
-
-Graphs are authored as **TypeScript** and executed with `schematify run <script>` (the script builds a graph and can publish live channel data). For writing or running those scripts, use the **schematify-graphs** skill; to derive a graph from a codebase or dataset, use **schematify-generate**.
-
-`schematify run` is capture-by-default — it does not write to the server unless you pass `--live`. Confirm flag behavior with `schematify run --help` before running.
+Graphs are written as TypeScript and run with `schematify run <script>` — capture-by-default, so nothing reaches the server without `--live`. Use the **schematify-graphs** skill to author and run scripts, and **schematify-generate** to derive a graph from a codebase or dataset.
