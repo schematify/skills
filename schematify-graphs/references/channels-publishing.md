@@ -1,60 +1,58 @@
 # Channels & Live Publishing
 
-> Snapshot of the v0.2.x live-data workflow. Confirm `schematify run` flags with `schematify run --help`.
+Use this reference only when a graph script defines channels, sends live values, or runs a polling loop. Confirm current runner flags with `schematify run --help`.
 
-## Contents
+## Mental model
 
-- The two halves: structure vs live values
-- Defining channels
-- Pushing values with `channelPublisher`
-- Polling loops
-- Capture vs live, and bounding loops
+- The graph document contains structure: nodes, links, attributes, and channel definitions.
+- Channel values are live data sent later with `channelPublisher`.
+- Channels are slots; the publisher fills those slots by node path.
 
-## The two halves
-
-A scriptable graph has two distinct concerns:
-
-1. **Structure** — nodes, links, attributes, and *channel definitions*. Established once with `graph(...).publish()`.
-2. **Live values** — the actual data flowing into those channels over time. Pushed with `channelPublisher`, repeatedly if you want a live graph.
-
-Channels are the slots; the publisher fills them.
-
-## Defining channels
-
-Declare channels on the nodes that carry live data, with a default for before any value arrives:
+## Define channels
 
 ```typescript
 node("server")
-  .label("Server")
   .channels([
-    channel("cpu").label("CPU").default("—"),
-    channel("mem").label("Memory").default("—").staleAfter(5000),
+    channel("status").label("Status").default("base/healthy"),
+    channel("cpu").label("CPU").default("—").staleAfter(5000),
   ])
   .status({ type: from.channel("status") });
 ```
 
-`staleAfter` (on the graph or per-channel) controls when a value is considered stale if no fresh value arrives.
+`staleAfter` can be set on the graph or individual channels.
 
-## Pushing values with `channelPublisher`
-
-After the graph is published, bind a publisher to its id and set values by **node path**:
+## Send values
 
 ```typescript
+await doc.publish();
+
 const pub = channelPublisher(doc.id);
-
-pub.set("server", { cpu: "45%", mem: "60%" });   // top-level node
-pub.set("server/disk", { usage: "82%" });         // nested node, path uses "/"
-
-const result = await pub.send();                  // one request for all buffered patches
-// result: { status: "delivered" } | { status: "dropped", reason: "..." }
+pub.set("server", { status: "base/healthy", cpu: "45%" });
+pub.set("server/disk", { usage: "82%" });
+await pub.send();
 ```
 
-- `.set()` is a **local buffer** — repeated calls to the same path merge keys; no network happens until `.send()`.
-- `.send()` flushes everything buffered in a **single** request and clears the buffer on success.
+`set()` only updates a local buffer. `send()` flushes the buffered patches. Node paths use `/` for nested nodes.
 
-## Polling loops
+## Capture vs live
 
-To keep a graph live, fetch data and publish on an interval. The interval keeps the sandbox alive:
+`schematify run` is safe by default: do not use `--live` unless the user explicitly asks for a real publish.
+
+In capture/default mode:
+
+- `doc.publish()` writes/captures the graph document according to the runner's current behavior.
+- `channelPublisher.send()` captures channel updates separately from the document, because live values are not part of the graph document.
+- The exact output paths and flags are CLI-owned; check `schematify run --help`.
+
+In live mode:
+
+- The document is published to Schematify.
+- Channel values are sent live.
+- Publishing a graph with an existing id can overwrite that graph.
+
+## Loops
+
+A script with an active interval keeps running:
 
 ```typescript
 async function main() {
@@ -62,40 +60,17 @@ async function main() {
   const pub = channelPublisher(doc.id);
 
   async function tick() {
-    const res = await fetch("https://metrics.internal/stats");
+    const res = await fetch("https://metrics.example/stats");
     const stats = await res.json();
-    pub.set("server", { cpu: `${stats.cpu}%`, mem: `${stats.memory}%` });
+    pub.set("server", { cpu: `${stats.cpu}%` });
     await pub.send();
   }
 
   setInterval(tick, 5000);
-  await tick();   // publish immediately, then every 5s
+  await tick();
 }
 
 main();
 ```
 
-## Capture vs live, and bounding loops
-
-`schematify run` is **capture-by-default**, and it treats the document and channel values differently because they are different things:
-
-- **`.publish()` (the document):** written to `--out` as a **real Schematify document JSON** — validatable and pushable. Overwritten each run.
-- **`.send()` (channel values):** *not* part of the document. Streamed to the **adjacent sidecar** `<out>.channels.ndjson` (one `{schemaId, patches}` object per line, appended) and echoed to stdout as a preview. Never written into the document file, never sent to the server in capture mode.
-
-```bash
-schematify run graph.ts                  # document → <out>.json ; channel values → <out>.channels.ndjson + stdout
-schematify run graph.ts --live           # real publish: document overwrites the server graph; channel values pushed live
-```
-
-A looping script never returns on its own. To validate one, **bound it** so it terminates, then read the sidecar:
-
-```bash
-schematify run graph.ts --max-publishes 3    # stop after 3 channel updates
-schematify run graph.ts --max-duration 5s    # stop after 5 seconds
-```
-
-Both bounds are opt-in and compose — whichever trips first ends the run cleanly. **`--max-publishes` counts channel updates** (the looping `.send()` calls), not the one-time document publish — so `--max-publishes 3` lets a polling script emit three channel updates to the sidecar, then exits.
-
-The document file is overwritten per run, so it always reflects the current script. The channel sidecar is appended (it's an event stream); delete it or use a fresh `--out` if you want only the current run's updates.
-
-**Workflow:** run in capture mode (bounded if it loops) → inspect the NDJSON → only on explicit user instruction, re-run with `--live`. Going live overwrites any existing graph with the same `id`; confirm the exact flag behavior with `schematify run --help`.
+When validating a loop, bound the run with the max-duration/max-publishes flags supported by the installed CLI. Inspect the captured channel output before any live run.

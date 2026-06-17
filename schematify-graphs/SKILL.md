@@ -1,88 +1,45 @@
 ---
 name: schematify-graphs
-description: Author Schematify graphs as scriptable TypeScript using the graph/node/channel builder API, run them safely, and publish live channel data. Use when writing or running a Schematify graph script, calling `schematify run`, building a graph in code, defining nodes/links/channels, wiring dynamic values, or publishing channel updates and polling loops.
+description: Edit or author Schematify graph TypeScript scripts using the graph/node/channel builder API. Use when modifying existing graph scripts, adding nodes/links/channels, wiring dynamic values, or sending channel updates.
 ---
 
-# Schematify Graphs (scriptable)
+# Schematify Graphs
 
-Schematify graphs are authored as **TypeScript** and executed with `schematify run <script>`. The script builds a graph with a fluent builder API (`graph`/`node`/`channel`), publishes it, and can push live data through a channel publisher — including in a loop.
+This is the graph-script layer. For CLI operations and flags, use `schematify --help` / `schematify <command> --help` and the `schematify-cli` skill. For generating graphs from a codebase or dataset, use `schematify-generate`.
 
-This skill is the **how to author** layer. For operating the CLI itself, see the `schematify-cli` skill. For turning a codebase or dataset *into* a graph, see the `schematify-generate` skill.
+## Editing existing scripts
 
-## Source of truth
+1. Read the script before changing it; preserve its graph id unless the user explicitly wants a new graph.
+2. Make the smallest structural change that satisfies the request. Match the script's existing builder style, naming, nesting, and channel patterns.
+3. Keep node ids stable unless the user is intentionally renaming/replacing a node. Links and publisher paths depend on those ids.
+4. For nested nodes, remember that runtime paths are ancestor ids joined with `/`.
+5. Do not add imports, `require`, Node APIs, or filesystem access; scripts run in the Schematify sandbox.
 
-The builder API is owned by the CLI. **Confirm the current surface before authoring** rather than trusting memory:
+## Authoring model
 
-```bash
-schematify run --help        # run flags and safety behavior
-```
+A graph script normally:
 
-The condensed API in this skill ([references/api-reference.md](references/api-reference.md)) is a snapshot of the v0.2.x builder. If the CLI exposes type definitions or a docs command, prefer that.
+1. Creates a document with `graph(uuid)`.
+2. Adds nodes with `node(id).label(...).type(...).children([...]).links([...])`.
+3. Defines live-value slots with `channel(id)` inside `.channels([...])`.
+4. Wires display/status values with `from.channel(...)`, `from.attribute(...)`, or `from.value(...)`.
+5. Calls `await doc.publish()`.
+6. Optionally sends live values with `channelPublisher(doc.id).set(nodePath, values).send()`.
 
-## Quick start
+Use `async function main() { ... }` and call `main()`; do not rely on top-level `await`.
 
-A graph script builds a document and publishes it. The `id` passed to `graph()` must be a UUID.
+## Safety while running
 
-```typescript
-async function main() {
-  const doc = graph("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d")
-    .label("My Platform")
-    .children([
-      node("api").label("API Gateway").type("microservices/load-balancer").links(["db"]),
-      node("db").label("Database").type("microservices/database"),
-    ]);
+Inspect `schematify run --help` before relying on runner flags or output paths.
 
-  await doc.publish();
-}
+Run in the default/capture mode first. Do **not** pass `--live` unless the user explicitly asks for a real publish. A live publish can overwrite the graph with the same id.
 
-main();
-```
+Looping scripts keep running; when validating one, bound it with the max-duration/max-publishes flags supported by the installed CLI.
 
-Scripts run in a sandboxed isolate: **no `import`, `require`, Node builtins, or filesystem**. The sandbox injects a focused set of globals (`graph`, `node`, `channel`, `from`, `channelPublisher`, `env`, `fetch`, `console`, timers). Top-level `await` is not supported — wrap async work in `main()` and call it.
+## Lazy references
 
-## Running safely
+Read only when needed:
 
-`schematify run` is **capture-by-default** — nothing reaches the server unless you pass `--live`. Capture splits two distinct things:
-
-- **The graph document** (`.publish()`) is written to `--out` as a **real Schematify document JSON** — the validatable, pushable artifact (default `~/.schematify/generations/<script>.json`). It is overwritten each run, not appended.
-- **Channel values** (`channelPublisher.send()`) are *not* part of the document — they are transient live data. In capture mode they are streamed to an **adjacent sidecar** `<out>.channels.ndjson` and echoed to stdout as a preview, never written into the document file.
-
-```bash
-schematify run graph.ts                          # safe: writes the document JSON, no server writes
-schematify validate <out>.json                   # the captured document is valid Schematify format
-schematify run graph.ts --live                   # real publish (confirms / overwrites server)
-```
-
-**The authoring loop:**
-
-1. Write the script.
-2. `schematify run graph.ts` — writes the document to `--out`; inspect it (and `schematify validate` it).
-3. Fix and re-run until the captured document is what you intend.
-4. **Only on explicit user instruction**, `schematify run graph.ts --live`.
-
-`--live` overwrites any existing graph with the same `id` on the server. Treat it as a deliberate, user-initiated act — never publish live by default. Confirm the exact flag behavior with `schematify run --help`.
-
-## Running scripts that loop
-
-A script that calls `setInterval` to publish channel updates **runs forever** — it will not return on its own. When running such a script for validation, bound it so it terminates:
-
-```bash
-schematify run graph.ts --max-publishes 3        # stop after 3 channel updates
-schematify run graph.ts --max-duration 5s        # stop after 5 seconds
-```
-
-`--max-publishes` counts **channel updates** (the loop), not the one-time document publish. Inspect the `.channels.ndjson` sidecar to confirm the loop emits the right values. (Bounds are opt-in; without them a finite script runs to completion and a loop runs until interrupted.)
-
-## Inspect without running
-
-To see the compiled document structure without any publish path at all, use `.compile()` in the script instead of `.publish()`:
-
-```typescript
-console.log(JSON.stringify(doc.compile(), null, 2));   // requires --debug to surface output
-```
-
-## References
-
-- **API reference** — `graph`/`node`/`channel`/`from`/`channelPublisher`, all methods: [references/api-reference.md](references/api-reference.md)
-- **Channels & publishing** — live data, `channelPublisher`, polling loops, capture vs live: [references/channels-publishing.md](references/channels-publishing.md)
-- **Examples** — runnable scripts: [examples/minimal.ts](examples/minimal.ts), [examples/with-channels.ts](examples/with-channels.ts), [examples/publish-loop.ts](examples/publish-loop.ts)
+- Exact builder methods and sandbox globals: [references/api-reference.md](references/api-reference.md)
+- Channel publishing, capture behavior, and loops: [references/channels-publishing.md](references/channels-publishing.md)
+- Minimal runnable script: [examples/minimal.ts](examples/minimal.ts)
