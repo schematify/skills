@@ -11,7 +11,7 @@ async function main() {
         .channels([channel("status").label("Status").default("base/healthy")])
         .status({ type: from.channel("status") })
         .links(["db"]),
-      node("db").label("Database").type("microservices/database"),
+      node("db").label("Database").type("databases/default"),
     ]);
 
   await doc.publish();
