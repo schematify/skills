@@ -112,7 +112,7 @@ Status badge ids are separate from node type ids. Use them in `.status({ type: .
 Set with `.render({ style: "..." })` only when the node should render differently from the default icon node.
 
 - `default` — normal graph node/icon; use for most nodes.
-- `property` — property/detail node; good for scalar facts attached to a parent.
+- `property` — property/detail node; good for scalar facts attached to a parent. Requires render params `header` and `display-value`; use `display-value` for the shown scalar value.
 - `report` — report/card-style node for summarized attributes/status.
 - `chart`, `pie-chart`, `line-chart`, `bar-chart` — chart-like nodes; provide needed values in `render.params`.
 
