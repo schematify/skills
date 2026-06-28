@@ -52,7 +52,7 @@ A node path is its id joined to ancestors with `/`, e.g. `api/routes`.
 |--------|---------|
 | `.label(name)` | Display name. |
 | `.type(typeId)` | Node type / texture identifier. |
-| `.attributes(obj)` | Key-value metadata. |
+| `.attributes(obj)` | Arbitrary key-value metadata for the node. Some attribute keys carry document semantics; `description` is the node description field and appears in pulled documents as `attributes.description`. |
 | `.channels(channels)` | Channel definitions for this node. |
 | `.status(config)` | Status binding, usually `{ type: from.channel(...) }`. |
 | `.render(config)` | Render style and parameter bindings. |

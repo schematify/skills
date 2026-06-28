@@ -18,6 +18,16 @@ Any graph related to Schematify must use Schematify graph scripts only; do not f
 5. Links always target absolute node paths from the graph root; never use relative paths.
 6. Do not add imports, `require`, Node APIs, or filesystem access; scripts run in the Schematify sandbox.
 
+## Document structure basics
+
+In pulled Schematify documents:
+
+- The diagram/document title is stored in the top-level `label` field.
+- The diagram/document description is stored in the top-level `description` field.
+- Node titles are stored in each node's `label` field.
+- Node attributes are arbitrary key-value metadata. Some attribute keys carry document semantics; `attributes.description` is the node description field.
+- The graph node tree is stored under the top-level `root` field.
+
 ## Authoring model
 
 A graph script normally:
