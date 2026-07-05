@@ -109,11 +109,11 @@ Status badge ids are separate from node type ids. Use them in `.status({ type: .
 
 ## Render styles
 
-Set with `.render({ style: "..." })` only when the node should render differently from the default icon node.
+Set `.render({ style: "..." })` only when the node should intentionally render differently from the default icon node.
 
-- `default` — normal graph node/icon; use for most nodes.
-- `property` — property/detail node; good for scalar facts attached to a parent.
-- `report` — report/card-style node for summarized attributes/status.
-- `chart`, `pie-chart`, `line-chart`, `bar-chart` — chart-like nodes; provide needed values in `render.params`.
+- `default` — normal graph node/icon; use for most nodes, including ordinary services, APIs, databases, queues, actors, containers, and external systems.
+- `property` — property/detail node for one small scalar fact attached to a parent. Do not use it for every field in a schema.
+- `report` — report/card-style node for naturally tabular or record-like content: database table definitions, compact config records, or explicit report/dashboard cards. Use sparingly; do not render normal services/infrastructure as reports by default.
+- `chart`, `pie-chart`, `line-chart`, `bar-chart` — chart-like nodes; use only when chart data/presentation is requested and provide needed values in `render.params`.
 
 Valid styles come from `apps/shared/src/schema/node.ts`. Pack ids above come from `apps/client/public/packs/*/index.yaml`.

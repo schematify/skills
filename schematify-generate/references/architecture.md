@@ -1,6 +1,6 @@
 # Architecture
 
-Generate a conceptual architecture graph: logical components and their major relationships, not a file listing.
+Generate a conceptual architecture graph: logical components and their major relationships, not a file listing. Architecture graphs are static design documentation unless the user explicitly asks for monitoring/live updates.
 
 ## Recon
 
@@ -21,5 +21,7 @@ Ignore generated/vendor/build directories unless relevant.
 - **Hierarchy:** containment becomes nested `.children([...])`.
 - **Links:** major communication/dependency paths only, source → target path.
 - **Types:** use project/texture-pack ids when known; otherwise sensible generic component/group/database types.
+- **Rendering:** use default rendering for ordinary services/infrastructure. Use report/property/chart styles only for explicit table-like records, dashboards, or scalar facts.
+- **Channels/status:** omit channels and status badges for static architecture graphs.
 
 Return the node/link plan to `schematify-generate` for graph authoring.

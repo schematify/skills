@@ -5,50 +5,86 @@ description: Edit or author Schematify graph TypeScript scripts using the graph/
 
 # Schematify Graphs
 
-This is the graph-script layer. For CLI operations and flags, use `schematify --help` / `schematify <command> --help` and the `schematify-cli` skill. For generating graphs from a codebase or dataset, use `schematify-generate`.
+Use Schematify graph scripts for Schematify diagrams; do not substitute Mermaid/DOT/other formats. For CLI commands/flags use the **schematify-cli** skill and `schematify --help`. For generation from source material use **schematify-generate**.
 
-Any graph related to Schematify must use Schematify graph scripts only; do not fall back to alternative graph formats.
+## Core graph-script rules
 
-## Editing existing scripts
+- Scripts run in a sandbox: no `import`, `require`, Node APIs, or filesystem access.
+- Use `async function main() { ... }` and call `main()`; do not rely on top-level `await`.
+- Create documents with `graph(uuid)`, nodes with `node(id)`, links with `.links([...])`, then `await doc.publish()`.
+- Node paths are ancestor ids joined with `/`. Links must target absolute paths from the graph root, e.g. `"backend/api"`, not relative paths.
+- Keep node ids stable when editing; links and publishers depend on ids.
+- When editing an existing script, first read it and preserve the graph id unless the user explicitly asks for a new diagram.
+- Match the existing style and make the smallest structural change that satisfies the request.
 
-1. Read the script before changing it; preserve its graph id unless the user explicitly wants a new graph.
-2. Make the smallest structural change that satisfies the request. Match the script's existing builder style, naming, nesting, and channel patterns.
-3. Keep node ids stable unless the user is intentionally renaming/replacing a node. Links and publisher paths depend on those ids.
-4. For nested nodes, remember that runtime paths are ancestor ids joined with `/`.
-5. Links always target absolute node paths from the graph root; never use relative paths.
-6. Do not add imports, `require`, Node APIs, or filesystem access; scripts run in the Schematify sandbox.
+## Static design diagrams vs live graphs
 
-## Document structure basics
+Most architecture, schema, design, and documentation diagrams are **static**. For static diagrams:
+
+- Do **not** add `channels(...)`, `.status(...)`, status badges, `from.channel(...)`, or `channelPublisher(...)`.
+- Use static `.attributes(...)`, `.description(...)`, and links to show ownership, dependencies, flows, and structure.
+- Keep normal architecture components as normal icon nodes: services, APIs, databases, queues, actors, containers, external systems.
+- Use non-default rendering only when it communicates a specific shape. Do not turn ordinary services/infrastructure into report cards.
+
+Use channels/status/publishers only when the user asks for a live/monitoring/telemetry graph or for dynamic channel updates.
+
+## Render style rules
+
+- Default render: use for almost all services, APIs, databases, queues, actors, containers, and external systems.
+- `report`: use sparingly for table-like or record-like information: database table definitions, compact configuration records, explicit reports/dashboards. Not for ordinary services by default.
+- `property`: use for a small scalar fact attached to a parent, not for every field in a schema.
+- Chart styles: use only when the user asks for chart-like data presentation and the necessary params/values are available.
+
+## Relational database schema style
+
+When drawing a relational database schema:
+
+- Keep surrounding architecture context unless the user asks for a schema-only diagram.
+- Model the database as `databases/postgres`, `databases/mysql`, or `databases/default`.
+- Model each table as a `databases/table` wrapper node.
+- Put ordinary columns on one nested report-style `Table Definition` node using attributes and `render.params.attributeIds`.
+- Do not create one child node per column.
+- Add child nodes under a table only for meaningful substructure: indexes, triggers, partitions, views, constraints as separate objects, or separate logical reports.
+- Link tables for logical relationships: foreign-key-like dependencies, join tables, outbox/event flows, deduplication, or ownership.
+
+Preferred table pattern:
+
+```typescript
+node("accounts")
+  .label("Accounts Table")
+  .type("databases/table")
+  .children([
+    node("definition")
+      .label("Table Definition")
+      .type("databases/table")
+      .render({
+        style: "report",
+        params: { attributeIds: ["account_key", "user_id", "org_id"] },
+      })
+      .attributes({
+        account_key: "TEXT PRIMARY KEY",
+        user_id: "TEXT NOT NULL",
+        org_id: "TEXT NOT NULL",
+      }),
+  ])
+```
+
+## Pulled document structure
 
 In pulled Schematify documents:
 
-- The diagram/document title is stored in the top-level `label` field.
-- The diagram/document description is stored in the top-level `description` field.
-- Node titles are stored in each node's `label` field.
-- Node attributes are arbitrary key-value metadata. Some attribute keys carry document semantics; `attributes.description` is the node description field.
-- The graph node tree is stored under the top-level `root` field.
+- Top-level `label` is the diagram title.
+- Top-level `description` is the diagram description.
+- Node `label` is the node title.
+- Node `attributes.description` is the node description field.
+- The node tree is under top-level `root`.
 
-## Authoring model
+## Validation and publishing safety
 
-A graph script normally:
-
-1. Creates a document with `graph(uuid)`.
-2. Adds nodes with `node(id).label(...).type(...).children([...]).links([...])`.
-3. Defines live-value slots with `channel(id)` inside `.channels([...])`.
-4. Adds links with absolute target paths, e.g. `.links(["backend/api"])`, not paths relative to the source node.
-5. Wires display/status values with `from.channel(...)`, `from.attribute(...)`, or `from.value(...)`.
-6. Calls `await doc.publish()`.
-7. Optionally sends live values with `channelPublisher(doc.id).set(nodePath, values).send()`.
-
-Use `async function main() { ... }` and call `main()`; do not rely on top-level `await`.
-
-## Safety while running
-
-Inspect `schematify run --help` before relying on runner flags or output paths.
-
-Run in the default/capture mode first. Do **not** pass `--live` unless the user explicitly asks for a real publish. A live publish can overwrite the graph with the same id.
-
-Looping scripts keep running; when validating one, bound it with the max-duration/max-publishes flags supported by the installed CLI.
+- Inspect `schematify dry-run --help` and `schematify run --help` before relying on flags.
+- Validate scripts with `schematify dry-run <script>` first; dry-run performs no server writes.
+- `schematify run <script>` publishes to the server. Only run it when the user asks to publish/update remotely.
+- Bound looping scripts with `--max-duration` when validating or publishing.
 
 ## Lazy references
 
@@ -56,5 +92,5 @@ Read only when needed:
 
 - Node type ids and render styles: [references/node-types.md](references/node-types.md)
 - Exact builder methods and sandbox globals: [references/api-reference.md](references/api-reference.md)
-- Channel publishing, capture behavior, and loops: [references/channels-publishing.md](references/channels-publishing.md)
+- Channel publishing, dry-run/publish behavior, and loops: [references/channels-publishing.md](references/channels-publishing.md)
 - Minimal runnable script: [examples/minimal.ts](examples/minimal.ts)

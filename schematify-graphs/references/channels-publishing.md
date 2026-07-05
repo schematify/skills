@@ -1,12 +1,15 @@
 # Channels & Live Publishing
 
-Use this reference only when a graph script defines channels, sends live values, or runs a polling loop. Confirm current runner flags with `schematify run --help`.
+Use this reference only when the user asks for live values, monitoring, telemetry, status updates, or polling loops. Static architecture/design/schema diagrams should not define channels or publishers.
+
+Confirm current runner flags with `schematify dry-run --help` and `schematify run --help`.
 
 ## Mental model
 
-- The graph document contains structure: nodes, links, attributes, and channel definitions.
-- Channel values are live data sent later with `channelPublisher`.
-- Channels are slots; the publisher fills those slots by node path.
+- The graph document contains structure: nodes, links, attributes, and optional channel definitions.
+- Channels are live-data slots on nodes.
+- `channelPublisher` sends values into those slots by absolute node path.
+- Channels/status are for runtime/live graphs, not ordinary documentation diagrams.
 
 ## Define channels
 
@@ -34,21 +37,21 @@ await pub.send();
 
 `set()` only updates a local buffer. `send()` flushes the buffered patches. Node paths use `/` for nested nodes.
 
-## Capture vs live
+## Dry-run vs publish
 
-`schematify run` is safe by default: do not use `--live` unless the user explicitly asks for a real publish.
+Validate without server writes:
 
-In capture/default mode:
+```bash
+schematify dry-run graph.ts
+```
 
-- `doc.publish()` writes/captures the graph document according to the runner's current behavior.
-- `channelPublisher.send()` captures channel updates separately from the document, because live values are not part of the graph document.
-- The exact output paths and flags are CLI-owned; check `schematify run --help`.
+Publish/send live values only when requested:
 
-In live mode:
+```bash
+schematify run graph.ts
+```
 
-- The document is published to Schematify.
-- Channel values are sent live.
-- Publishing a graph with an existing id can overwrite that graph.
+`run` writes to the server. Publishing a graph with an existing id can overwrite that graph.
 
 ## Loops
 
@@ -73,4 +76,4 @@ async function main() {
 main();
 ```
 
-When validating a loop, bound the run with the max-duration/max-publishes flags supported by the installed CLI. Inspect the captured channel output before any live run.
+When validating or publishing a loop, bound it with the duration controls supported by the installed CLI, e.g. `--max-duration` when available.

@@ -41,7 +41,7 @@ await doc.publish();
 | `.nodeTypes(packs)` | Custom node type textures. |
 | `.children(nodes)` | Top-level nodes. |
 | `.compile()` | Return the document object without publishing. |
-| `.publish()` | Validate, compile, and publish/capture through the runner. |
+| `.publish()` | Validate, compile, and hand the document to the runner. `dry-run` prints without writes; `run` publishes to the server. |
 | `.id` | Graph UUID; pass to `channelPublisher`. |
 
 ## `node(id)`
@@ -96,7 +96,7 @@ await pub.send();
 | `.set(nodePath, channels)` | Buffer channel values for a node path. Repeated calls to the same path merge keys. |
 | `.send()` | Flush buffered values in one async request; clears the buffer on success. |
 
-For capture/live behavior and loops, read [channels-publishing.md](channels-publishing.md) only when needed.
+For dry-run/publish behavior and loops, read [channels-publishing.md](channels-publishing.md) only when needed.
 
 ## Other globals
 
