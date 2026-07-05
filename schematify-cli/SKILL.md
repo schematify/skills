@@ -42,4 +42,18 @@ For node/path/link/channel structure, use the **schematify-graphs** skill rather
 
 ## Authoring graphs
 
-Graphs are written as TypeScript and run with `schematify run <script>` — capture-by-default, so nothing reaches the server without `--live`. Use the **schematify-graphs** skill to author and run scripts, and **schematify-generate** to derive a graph from a codebase or dataset.
+Graphs are written as TypeScript. Use the **schematify-graphs** skill for graph structure and style, and **schematify-generate** to derive a graph from a codebase or dataset.
+
+Validate without server writes first:
+
+```bash
+schematify dry-run <script>
+```
+
+Publish only when requested:
+
+```bash
+schematify run <script>
+```
+
+`run` writes to the server; `dry-run` does not.

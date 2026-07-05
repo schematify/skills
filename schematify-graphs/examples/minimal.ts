@@ -1,5 +1,5 @@
-// Minimal graph script: structure, one channel, one live-value send.
-// Run in default/capture mode first. Use --live only when you intend to publish.
+// Minimal live graph script: structure, one channel, one live-value send.
+// Validate with `schematify dry-run`; publish with `schematify run` only when intended.
 
 async function main() {
   const doc = graph("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d")
