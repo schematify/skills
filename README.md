@@ -16,7 +16,9 @@ This installs all Schematify skills while still prompting you to choose the agen
 
 - **schematify-graphs** — Author Schematify graphs as scriptable TypeScript using the `graph`/`node`/`channel` builder API, run them safely, and publish live channel data.
 
+- **schematify-render** — Configure the style-dependent `.render()` interface for property nodes, reports, and every supported chart style.
+
 - **schematify-generate** — Turn a codebase, directory, or dataset into a graph: work out what to map and how to source it, then author it with schematify-graphs.
 
-The three compose: **schematify-cli** operates the tool, **schematify-graphs** authors graphs in code, and **schematify-generate** sources nodes and links from a project or dataset and hands them to schematify-graphs.
+The four compose: **schematify-cli** operates the tool, **schematify-graphs** authors graph structure, **schematify-render** configures specialized node presentation, and **schematify-generate** sources nodes and links from a project or dataset.
 

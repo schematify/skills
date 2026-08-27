@@ -10,8 +10,13 @@ async function main() {
         .type("microservices/service")
         .channels([channel("status").label("Status").default("base/healthy")])
         .status({ type: from.channel("status") })
-        .links(["db"]),
-      node("db").label("Database").type("databases/default"),
+        .links(["data/db"]),
+      node("data")
+        .label("Data")
+        .type("base/collection")
+        .children([
+          node("db").label("Database").type("databases/default"),
+        ]),
     ]);
 
   await doc.publish();

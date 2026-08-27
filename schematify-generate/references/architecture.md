@@ -21,7 +21,7 @@ Ignore generated/vendor/build directories unless relevant.
 - **Hierarchy:** containment becomes nested `.children([...])`.
 - **Links:** major communication/dependency paths only, source → target path.
 - **Types:** use project/texture-pack ids when known; otherwise sensible generic component/group/database types.
-- **Rendering:** use default rendering for ordinary services/infrastructure. Use report/property/chart styles only for explicit table-like records, dashboards, or scalar facts.
+- **Rendering:** use default rendering for ordinary services/infrastructure. If the plan needs a table-like record, scalar property, or chart, load `schematify-render` before configuring it.
 - **Channels/status:** omit channels and status badges for static architecture graphs.
 
 Return the node/link plan to `schematify-generate` for graph authoring.

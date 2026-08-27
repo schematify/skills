@@ -37,4 +37,4 @@ Read the matching reference:
 
 After source-first analysis, produce a plan: nodes with ids, labels, types, descriptions, hierarchy, and links as source → target paths. Important nodes and links should be grounded in inspected source material or clearly identified as inferred. The graph already has an implicit root; do not add a redundant top-level root node.
 
-Then use `schematify-graphs` to author and validate the TypeScript script. Even when reading JSON sources or examples, write new graph outputs as TypeScript. Validate with `schematify dry-run <script>` first. Publish with `schematify run <script>` only on explicit user instruction.
+Then use `schematify-graphs` to author and validate the TypeScript script. Load `schematify-render` if any node uses `.render(...)`. Even when reading JSON sources or examples, write new graph outputs as TypeScript. Validate with `schematify dry-run <script>` first. Publish with `schematify run <script>` only on explicit user instruction.
