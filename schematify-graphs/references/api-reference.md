@@ -26,8 +26,10 @@ Async scripts should use a `main()` function; do not rely on top-level `await`.
 const doc = graph("550e8400-e29b-41d4-a716-446655440000")
   .label("My Platform")
   .children([
-    node("api").label("API").links(["db"]),
-    node("db").label("Database"),
+    node("api").label("API").links(["data/db"]),
+    node("data").label("Data").children([
+      node("db").label("Database"),
+    ]),
   ]);
 
 await doc.publish();
@@ -55,8 +57,8 @@ A node path is its id joined to ancestors with `/`, e.g. `api/routes`.
 | `.attributes(obj)` | Arbitrary key-value metadata for the node. Some attribute keys carry document semantics; `description` is the node description field and appears in pulled documents as `attributes.description`. |
 | `.channels(channels)` | Channel definitions for this node. |
 | `.status(config)` | Status binding, usually `{ type: from.channel(...) }`. |
-| `.render(config)` | Render style and parameter bindings. |
-| `.links(paths)` | Target node paths. Sibling ids or full paths. |
+| `.render(config)` | Style-dependent render configuration. Load **schematify-render** before using it. |
+| `.links(paths)` | Absolute target paths from the graph root. A root child path is its id; nested targets include every ancestor id. |
 | `.children(nodes)` | Nested child nodes. |
 
 Node type ids and status values are Schematify texture-pack identifiers. Prefer ids from known examples or current Schematify docs over invented values.
@@ -96,7 +98,7 @@ await pub.send();
 | `.set(nodePath, channels)` | Buffer channel values for a node path. Repeated calls to the same path merge keys. |
 | `.send()` | Flush buffered values in one async request; clears the buffer on success. |
 
-For dry-run/publish behavior and loops, read [channels-publishing.md](channels-publishing.md) only when needed.
+For `.render(...)`, use the **schematify-render** skill. For dry-run/publish behavior and loops, read [channels-publishing.md](channels-publishing.md) only when needed.
 
 ## Other globals
 

@@ -5,7 +5,7 @@ description: Edit or author Schematify graph TypeScript scripts using the graph/
 
 # Schematify Graphs
 
-Use Schematify graph scripts for Schematify diagrams; do not substitute Mermaid/DOT/other formats. For CLI commands/flags use the **schematify-cli** skill and `schematify --help`. For generation from source material use **schematify-generate**.
+Use Schematify graph scripts for Schematify diagrams; do not substitute Mermaid/DOT/other formats. For CLI commands/flags use the **schematify-cli** skill and `schematify --help`. For generation from source material use **schematify-generate**. Whenever a script uses `.render(...)`, load **schematify-render** and follow its style-specific interface.
 
 ## Core graph-script rules
 
@@ -28,12 +28,9 @@ Most architecture, schema, design, and documentation diagrams are **static**. Fo
 
 Use channels/status/publishers only when the user asks for a live/monitoring/telemetry graph or for dynamic channel updates.
 
-## Render style rules
+## Specialized rendering
 
-- Default render: use for almost all services, APIs, databases, queues, actors, containers, and external systems.
-- `report`: use sparingly for table-like or record-like information: database table definitions, compact configuration records, explicit reports/dashboards. Not for ordinary services by default.
-- `property`: use for a small scalar fact attached to a parent, not for every field in a schema.
-- Chart styles: use only when the user asks for chart-like data presentation and the necessary params/values are available.
+Use default rendering for ordinary graph nodes. Load **schematify-render** before authoring property, report, pie chart, bar chart, or line chart nodes. That skill defines each style's required params, binding support, and sizing behavior.
 
 ## Relational database schema style
 
@@ -90,7 +87,7 @@ In pulled Schematify documents:
 
 Read only when needed:
 
-- Node type ids and render styles: [references/node-types.md](references/node-types.md)
+- Node type ids and status badges: [references/node-types.md](references/node-types.md)
 - Exact builder methods and sandbox globals: [references/api-reference.md](references/api-reference.md)
 - Channel publishing, dry-run/publish behavior, and loops: [references/channels-publishing.md](references/channels-publishing.md)
 - Minimal runnable script: [examples/minimal.ts](examples/minimal.ts)

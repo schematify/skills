@@ -1,4 +1,4 @@
-# Node Types, Status Badges, and Render Styles
+# Node types and status badges
 
 Use `.type("pack/id")` to choose node visuals. Prefer these real pack ids over generic `base/default`.
 
@@ -107,13 +107,4 @@ Status badge ids are separate from node type ids. Use them in `.status({ type: .
 - `base/healthy` — healthy/OK badge.
 - `base/unknown` — unknown badge.
 
-## Render styles
-
-Set `.render({ style: "..." })` only when the node should intentionally render differently from the default icon node.
-
-- `default` — normal graph node/icon; use for most nodes, including ordinary services, APIs, databases, queues, actors, containers, and external systems.
-- `property` — property/detail node for one small scalar fact attached to a parent. Do not use it for every field in a schema.
-- `report` — report/card-style node for naturally tabular or record-like content: database table definitions, compact config records, or explicit report/dashboard cards. Use sparingly; do not render normal services/infrastructure as reports by default.
-- `chart`, `pie-chart`, `line-chart`, `bar-chart` — chart-like nodes; use only when chart data/presentation is requested and provide needed values in `render.params`.
-
-Valid styles come from `apps/shared/src/schema/node.ts`. Pack ids above come from `apps/client/public/packs/*/index.yaml`.
+Render styles are separate from node types. Use the **schematify-render** skill for `.render(...)`, style-specific params, bindings, and sizing.

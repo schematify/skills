@@ -42,7 +42,7 @@ For node/path/link/channel structure, use the **schematify-graphs** skill rather
 
 ## Authoring graphs
 
-Graphs are written as TypeScript. Use the **schematify-graphs** skill for graph structure and style, and **schematify-generate** to derive a graph from a codebase or dataset.
+Graphs are written as TypeScript. Use **schematify-graphs** for graph structure, **schematify-render** for `.render(...)` styles and params, and **schematify-generate** to derive a graph from a codebase or dataset.
 
 Validate without server writes first:
 
