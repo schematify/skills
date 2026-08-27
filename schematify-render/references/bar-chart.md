@@ -38,17 +38,17 @@ These params pass through standard binding resolution.
 | Param | Required | Binding support | Value and default |
 |---|---:|---|---|
 | `data` | Yes | attribute, channel, literal | Chart dataset. |
-| `header` | No | attribute, channel, literal, raw | Title above the chart. Default is no title. |
-| `yLabel` | No | attribute, channel, literal, raw | Rotated vertical-axis label. Default is no label. |
-| `domainMin` | No | attribute, channel, literal, raw | Explicit numeric y-axis minimum. Auto-calculated when absent. |
-| `domainMax` | No | attribute, channel, literal, raw | Explicit numeric y-axis maximum. Auto-calculated when absent. |
-| `baseline` | No | attribute, channel, literal, raw | Numeric value from which bars extend. Default is `0`. |
+| `header` | No | attribute, channel, literal, direct | Title above the chart. Default is no title. |
+| `yLabel` | No | attribute, channel, literal, direct | Rotated vertical-axis label. Default is no label. |
+| `domainMin` | No | attribute, channel, literal, direct | Explicit numeric y-axis minimum. Auto-calculated when absent. |
+| `domainMax` | No | attribute, channel, literal, direct | Explicit numeric y-axis maximum. Auto-calculated when absent. |
+| `baseline` | No | attribute, channel, literal, direct | Numeric value from which bars extend. Default is `0`. |
 
 Set `domainMin` lower than `domainMax`. Include the intended baseline and data range inside the domain when fixing the bounds.
 
 ## Display configuration params
 
-These are **raw-only** configuration values. Do not wrap them in `from.value(...)`, `from.attribute(...)`, or `from.channel(...)`.
+These are **direct-only** configuration values. Do not wrap them in `from.value(...)`, `from.attribute(...)`, or `from.channel(...)`.
 
 | Param | Required | Values and default |
 |---|---:|---|

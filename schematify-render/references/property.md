@@ -13,7 +13,7 @@ node("latency")
       header: from.value("P99 latency"),
       "display-value": from.attribute("latency_p99"),
     },
-    scale: { x: 1.5, y: 1.2 },
+    scale: { x: 2.5, y: 1.35 },
   })
 ```
 
@@ -21,8 +21,8 @@ node("latency")
 
 | Param | Required | Binding support | Value |
 |---|---:|---|---|
-| `header` | Yes | attribute, channel, literal, raw | Text displayed above the value. |
-| `display-value` | Yes | attribute, channel, literal, raw | The prominent scalar value. |
+| `header` | Yes | attribute, channel, literal, direct | Text displayed above the value. |
+| `display-value` | Yes | attribute, channel, literal, direct | The prominent scalar value. |
 
 The renderer resolves both params through the standard binding helpers.
 
@@ -33,7 +33,19 @@ The renderer resolves both params through the standard binding helpers.
 - If the header is missing or empty, the node displays `Value not set` and does not display the supplied value. Treat `header` as required.
 - The node's `.label(...)` remains the external canvas label. It is separate from the property header.
 
-Property nodes use the node type texture's base dimensions. `render.scale` multiplies that width and height.
+## Sizing
+
+Property nodes use the node type texture's base dimensions. The renderer does not guarantee a rectangular card, so a structurally valid property node can still appear circular or leave too little room for its header.
+
+Always set an explicit `render.scale`. The width must be clearly greater than the height so the node reads as a card and its uppercased header remains readable.
+
+Use this as a starting point:
+
+```typescript
+scale: { x: 2.5, y: 1.35 }
+```
+
+Increase `x` for longer headers. The node's `.label(...)` is an external canvas label and does not replace the internal property header. A successful dry run does not check text fit or visual proportions.
 
 ## Live value example
 
@@ -50,7 +62,7 @@ node("queue-depth")
       header: from.value("Pending messages"),
       "display-value": from.channel("depth"),
     },
-    scale: { x: 1.5, y: 1.2 },
+    scale: { x: 2.5, y: 1.35 },
   })
 ```
 

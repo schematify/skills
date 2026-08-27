@@ -23,7 +23,7 @@ node("definition")
 
 | Param | Required | Binding support | Value |
 |---|---:|---|---|
-| `attributeIds` | Yes | Raw only | Non-empty array of attribute or channel ids, in display order. |
+| `attributeIds` | Yes | Direct only | Non-empty array of attribute or channel ids, in display order. |
 
 Pass `attributeIds` directly as a string array. Do not use `from.value(...)`, `from.attribute(...)`, or `from.channel(...)` for the array itself.
 

@@ -43,17 +43,17 @@ These params pass through standard binding resolution.
 |---|---:|---|---|
 | `data` | One of `data` or `datasets` | attribute, channel, literal | Single-series dataset. |
 | `datasets` | One of `data` or `datasets` | attribute, channel, literal | Array of `{ label, data }` series. A non-empty `datasets` array takes precedence over `data`. |
-| `header` | No | attribute, channel, literal, raw | Title above the chart. Default is no title. |
-| `yLabel` | No | attribute, channel, literal, raw | Rotated vertical-axis label. Default is no label. |
-| `domainMin` | No | attribute, channel, literal, raw | Explicit numeric y-axis minimum. Auto-calculated when absent. |
-| `domainMax` | No | attribute, channel, literal, raw | Explicit numeric y-axis maximum. Auto-calculated when absent. |
-| `baseline` | No | attribute, channel, literal, raw | Numeric value used for the baseline and area fill. Default is `0`. |
+| `header` | No | attribute, channel, literal, direct | Title above the chart. Default is no title. |
+| `yLabel` | No | attribute, channel, literal, direct | Rotated vertical-axis label. Default is no label. |
+| `domainMin` | No | attribute, channel, literal, direct | Explicit numeric y-axis minimum. Auto-calculated when absent. |
+| `domainMax` | No | attribute, channel, literal, direct | Explicit numeric y-axis maximum. Auto-calculated when absent. |
+| `baseline` | No | attribute, channel, literal, direct | Numeric value used for the baseline and area fill. Default is `0`. |
 
 Set `domainMin` lower than `domainMax`. Include the intended baseline and values inside fixed bounds.
 
 ## Display configuration params
 
-These are **raw-only** configuration values. Do not wrap them in `from.value(...)`, `from.attribute(...)`, or `from.channel(...)`.
+These are **direct-only** configuration values. Do not wrap them in `from.value(...)`, `from.attribute(...)`, or `from.channel(...)`.
 
 | Param | Required | Values and default |
 |---|---:|---|
