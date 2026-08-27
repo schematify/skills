@@ -1,15 +1,14 @@
-# Channels & Live Publishing
+# Channels and live publishing
 
-Use this reference only when the user asks for live values, monitoring, telemetry, status updates, or polling loops. Static architecture/design/schema diagrams should not define channels or publishers.
+Use channels when values must change after the graph document is published. Monitoring, telemetry, status updates, and polling are common examples. Static architecture, design, and schema diagrams should normally use attributes instead.
 
-Confirm current runner flags with `schematify dry-run --help` and `schematify run --help`.
+## Terms
 
-## Mental model
-
-- The graph document contains structure: nodes, links, attributes, and optional channel definitions.
-- Channels are live-data slots on nodes.
-- `channelPublisher` sends values into those slots by absolute node path.
-- Channels/status are for runtime/live graphs, not ordinary documentation diagrams.
+- A **channel** is a named live value slot defined on a node.
+- A **channel default** is the initial or fallback value included in the graph document.
+- A **channel publisher** sends replacement values to channels on an already published graph.
+- A **live graph** contains channel values that can change without rebuilding its node and link structure.
+- A **real-time update** is a channel value sent while the publishing script is running. The update frequency comes from the script or its data source.
 
 ## Define channels
 
@@ -17,12 +16,12 @@ Confirm current runner flags with `schematify dry-run --help` and `schematify ru
 node("server")
   .channels([
     channel("status").label("Status").default("base/healthy"),
-    channel("cpu").label("CPU").default("—").staleAfter(5000),
+    channel("cpu").label("CPU").default("N/A").staleAfter(5000),
   ])
   .status({ type: from.channel("status") });
 ```
 
-`staleAfter` can be set on the graph or individual channels.
+Set `staleAfter` on the graph for a shared threshold or on one channel for a specific threshold.
 
 ## Send values
 
@@ -35,9 +34,9 @@ pub.set("server/disk", { usage: "82%" });
 await pub.send();
 ```
 
-`set()` only updates a local buffer. `send()` flushes the buffered patches. Node paths use `/` for nested nodes.
+`set()` updates a local buffer. `send()` transmits the buffered changes. Publisher paths are root-relative node paths.
 
-## Dry-run vs publish
+## Dry-run and publish
 
 Validate without server writes:
 
@@ -45,17 +44,17 @@ Validate without server writes:
 schematify dry-run graph.ts
 ```
 
-Publish/send live values only when requested:
+Publish the graph and send channel values only when requested:
 
 ```bash
 schematify run graph.ts
 ```
 
-`run` writes to the server. Publishing a graph with an existing id can overwrite that graph.
+Publishing a graph with an existing id can overwrite the server document.
 
-## Loops
+## Polling loops
 
-A script with an active interval keeps running:
+An active interval keeps the script running:
 
 ```typescript
 async function main() {
@@ -63,8 +62,8 @@ async function main() {
   const pub = channelPublisher(doc.id);
 
   async function tick() {
-    const res = await fetch("https://metrics.example/stats");
-    const stats = await res.json();
+    const response = await fetch("https://metrics.example/stats");
+    const stats = await response.json();
     pub.set("server", { cpu: `${stats.cpu}%` });
     await pub.send();
   }
@@ -76,4 +75,4 @@ async function main() {
 main();
 ```
 
-When validating or publishing a loop, bound it with the duration controls supported by the installed CLI, e.g. `--max-duration` when available.
+Use the installed CLI help to find its duration option. Bound loops during validation and one-off publishing so they cannot run indefinitely.

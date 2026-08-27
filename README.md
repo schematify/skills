@@ -1,6 +1,6 @@
-# Agent Skills
+# Schematify agent skills
 
-A collection of agent skills for [Schematify](https://schematify.com) — the relational data graph rendering tool.
+Schematify builds and publishes graph diagrams from TypeScript scripts containing nested nodes, directional links, and optional live data. This repository contains the agent skills for creating and operating those diagrams.
 
 ## Install all skills
 
@@ -8,17 +8,15 @@ A collection of agent skills for [Schematify](https://schematify.com) — the re
 npx skills@latest add schematify/skills --skill '*'
 ```
 
-This installs all Schematify skills while still prompting you to choose the agent harness and whether to install globally or for the current project.
+The installer asks which agent harness to use and whether to install the skills globally or in the current project.
 
 ## Skills
 
-- **schematify-cli** — Operate the Schematify CLI tool. Use whenever working with graphs, schemas, documents, or any Schematify resource.
+| Skill | Use it for |
+|---|---|
+| **schematify-cli** | Discover CLI commands and inspect or change published Schematify resources. |
+| **schematify-graphs** | Create and edit TypeScript graph scripts using the `graph`, `node`, and `channel` builders. |
+| **schematify-render** | Configure property cards, reports, and charts through `.render(...)`. |
+| **schematify-generate** | Derive a graph from a codebase, directory, dataset, or described system. |
 
-- **schematify-graphs** — Author Schematify graphs as scriptable TypeScript using the `graph`/`node`/`channel` builder API, run them safely, and publish live channel data.
-
-- **schematify-render** — Configure the style-dependent `.render()` interface for property nodes, reports, and every supported chart style.
-
-- **schematify-generate** — Turn a codebase, directory, or dataset into a graph: work out what to map and how to source it, then author it with schematify-graphs.
-
-The four compose: **schematify-cli** operates the tool, **schematify-graphs** authors graph structure, **schematify-render** configures specialized node presentation, and **schematify-generate** sources nodes and links from a project or dataset.
-
+A typical source workflow starts with **schematify-generate**, authors the script with **schematify-graphs**, adds specialized presentation with **schematify-render**, then validates or publishes through **schematify-cli**.

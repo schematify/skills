@@ -1,6 +1,6 @@
 # Pie chart render style
 
-Use `pie-chart` to show positive parts of a whole. Read [chart-data.md](chart-data.md) for accepted data shapes.
+Use `pie-chart` to show positive parts of a whole. Read [chart-data.md](chart-data.md) for accepted dataset shapes.
 
 ```typescript
 node("traffic")
@@ -25,23 +25,23 @@ node("traffic")
   })
 ```
 
-## Params
+## Parameters
 
-| Param | Required | Binding support | Values and default |
+| Parameter | Required | Binding support | Values and default |
 |---|---:|---|---|
 | `data` | Yes | attribute, channel, literal | Chart dataset. Only finite values greater than zero become slices. |
-| `header` | No | attribute, channel, literal, raw | Title above the chart. Default is no title. |
-| `legend` | No | attribute, channel, literal, raw | `"right"`, `"bottom"`, or `false`. Default is `"right"`. Strings `"false"` and `"none"` also hide it. |
-| `padding` | No | attribute, channel, literal, raw | Internal padding ratio from `0` to `1`. Default is `0.1`. |
+| `header` | No | attribute, channel, literal, direct | Title above the chart. No title by default. |
+| `legend` | No | attribute, channel, literal, direct | `"right"`, `"bottom"`, or `false`. Default is `"right"`. Strings `"false"` and `"none"` also hide it. |
+| `padding` | No | attribute, channel, literal, direct | Internal padding ratio from `0` to `1`. Default is `0.1`. |
 
-All pie chart params pass through standard binding resolution. Raw values and `from.value(...)` both work.
+Complex `data` values must use an attribute, channel, or literal binding. The scalar display parameters accept either supported bindings or direct values.
 
 ## Rendering behavior
 
-- Slice colors are generated from the node type's background color.
+- Slice colors derive from the node type's background color.
 - Hovering a slice displays its label, value, and percentage of the total.
 - Empty or invalid data displays the chart's empty state.
-- The legend truncates entries when the available chart height cannot fit every row.
-- Any unsupported `legend` value falls back to `"right"`.
+- The legend truncates entries when the available height cannot fit every row.
+- An unsupported `legend` value falls back to `"right"`.
 
 Charts have a 200 by 200 pixel base size. `scale: { x: 2.5, y: 2 }` requests a 500 by 400 chart area. Allow enough width for a right-hand legend or enough height for a bottom legend.

@@ -1,93 +1,90 @@
 ---
 name: schematify-graphs
-description: Edit or author Schematify graph TypeScript scripts using the graph/node/channel builder API. Use when modifying existing graph scripts, adding nodes/links/channels, wiring dynamic values, or sending channel updates.
+description: Edit or author Schematify TypeScript graph scripts with the graph, node, and channel builder API. Use for graph structure, links, live values, and updates to existing source scripts.
 ---
 
-# Schematify Graphs
+# Schematify graphs
 
-Use Schematify graph scripts for Schematify diagrams; do not substitute Mermaid/DOT/other formats. For CLI commands/flags use the **schematify-cli** skill and `schematify --help`. For generation from source material use **schematify-generate**. Whenever a script uses `.render(...)`, load **schematify-render** and follow its style-specific interface.
+Schematify graph scripts define a graph document and publish it through the CLI runner. Use **schematify-cli** for commands and flags, **schematify-generate** when deriving a graph from source material, and **schematify-render** for `.render(...)`.
 
-## Core graph-script rules
+## Graph terms
 
-- Scripts run in a sandbox: no `import`, `require`, Node APIs, or filesystem access.
-- Use `async function main() { ... }` and call `main()`; do not rely on top-level `await`.
-- Create documents with `graph(uuid)`, nodes with `node(id)`, links with `.links([...])`, then `await doc.publish()`.
-- Node paths are ancestor ids joined with `/`. Links must target absolute paths from the graph root, e.g. `"backend/api"`, not relative paths.
-- Keep node ids stable when editing; links and publishers depend on ids.
-- When editing an existing script, first read it and preserve the graph id unless the user explicitly asks for a new diagram.
-- Match the existing style and make the smallest structural change that satisfies the request.
+- A **graph document** has a UUID, label, optional description, and root node collection.
+- A **node id** identifies a node among its siblings.
+- A **node path** joins ancestor ids with `/`, such as `backend/api`. It is root-relative and never starts with `/`.
+- An **attribute** is static metadata published with the graph document.
+- A **channel** is a named value slot that can receive new values after the graph is published.
 
-## Static design diagrams vs live graphs
+## Core script rules
 
-Most architecture, schema, design, and documentation diagrams are **static**. For static diagrams:
+- Scripts run in a sandbox without `import`, `require`, Node APIs, or filesystem access.
+- Use `async function main()`, call `main()`, and avoid top-level `await`.
+- Create the document with `graph(uuid)`, nodes with `node(id)`, and links with `.links([...])`.
+- Link targets are root-relative node paths.
+- Finish the document workflow with `await doc.publish()`.
+- Keep graph and node ids stable when editing. Links and publishers depend on them.
+- Match the existing source style and make the smallest change that satisfies the request.
 
-- Do **not** add `channels(...)`, `.status(...)`, status badges, `from.channel(...)`, or `channelPublisher(...)`.
-- Use static `.attributes(...)`, `.description(...)`, and links to show ownership, dependencies, flows, and structure.
-- Keep normal architecture components as normal icon nodes: services, APIs, databases, queues, actors, containers, external systems.
-- Use non-default rendering only when it communicates a specific shape. Do not turn ordinary services/infrastructure into report cards.
+## Editing local source
 
-Use channels/status/publishers only when the user asks for a live/monitoring/telemetry graph or for dynamic channel updates.
+When the task creates or maintains a TypeScript graph script, use that script as the authoring source:
+
+1. Read the target script.
+2. Edit that script directly.
+3. Validate it with `schematify dry-run`.
+4. Publish only when the user asks.
+
+The server stores a JSON graph document and can receive independent edits. Do not replace local source with pulled JSON or inspect unrelated published graphs for examples. If the user asks to reconcile server-side changes, pull that specific graph, compare it with the source script, and resolve the difference explicitly.
+
+If the user identifies the faulty field or supplies the correction, apply it to the source before doing more research. Read only the local reference needed to confirm syntax or behavior.
+
+## Static and live data
+
+Most architecture, schema, design, and documentation graphs are static.
+
+For a static graph:
+
+- Put facts in attributes.
+- Omit channels, publishers, and status bindings.
+- Use ordinary node types for services, APIs, databases, queues, actors, containers, and external systems.
+- Use specialized rendering only when it communicates a scalar value, compact record, or chart.
+
+Live data means a value can change after the graph document is published. Define a `channel(...)` on the node, then use `channelPublisher(doc.id)` to send replacement values to that channel. A status or render parameter can read the current value with `from.channel(...)`. Channel updates change values, not graph structure.
+
+Use live data only when the user asks for monitoring, telemetry, status updates, polling, or another ongoing update flow. Read [references/channels-publishing.md](references/channels-publishing.md) before implementing it.
 
 ## Specialized rendering
 
-Use default rendering for ordinary graph nodes. Load **schematify-render** before authoring property, report, pie chart, bar chart, or line chart nodes. That skill defines each style's required params, binding support, and sizing behavior.
+Use default rendering for ordinary nodes. Load **schematify-render** before using property, report, pie chart, bar chart, or line chart styles. That skill defines each style's parameters, bindings, and sizing behavior.
 
-## Relational database schema style
+For a relational database schema, read [references/database-schema.md](references/database-schema.md).
 
-When drawing a relational database schema:
+## Pulled graph documents
 
-- Keep surrounding architecture context unless the user asks for a schema-only diagram.
-- Model the database as `databases/postgres`, `databases/mysql`, or `databases/default`.
-- Model each table as a `databases/table` wrapper node.
-- Put ordinary columns on one nested report-style `Table Definition` node using attributes and `render.params.attributeIds`.
-- Do not create one child node per column.
-- Add child nodes under a table only for meaningful substructure: indexes, triggers, partitions, views, constraints as separate objects, or separate logical reports.
-- Link tables for logical relationships: foreign-key-like dependencies, join tables, outbox/event flows, deduplication, or ownership.
+In JSON returned by `schematify pull`:
 
-Preferred table pattern:
+- top-level `label` is the diagram title,
+- top-level `description` describes the diagram,
+- node `label` is the node title,
+- node `attributes.description` is the node description,
+- the node tree is under top-level `root`.
 
-```typescript
-node("accounts")
-  .label("Accounts Table")
-  .type("databases/table")
-  .children([
-    node("definition")
-      .label("Table Definition")
-      .type("databases/table")
-      .render({
-        style: "report",
-        params: { attributeIds: ["account_key", "user_id", "org_id"] },
-      })
-      .attributes({
-        account_key: "TEXT PRIMARY KEY",
-        user_id: "TEXT NOT NULL",
-        org_id: "TEXT NOT NULL",
-      }),
-  ])
-```
+Use pulled JSON to inspect published state. Do not treat it as a replacement for an existing TypeScript source script unless the user explicitly chooses that direction.
 
-## Pulled document structure
+## Validation and publishing
 
-In pulled Schematify documents:
+- Check `schematify dry-run --help` and `schematify run --help` before using flags.
+- Run `schematify dry-run <script>` before publishing. It performs no server writes.
+- Dry-run validates structure and renderer configuration. It does not prove that text fits or that the rendered proportions are readable.
+- Run `schematify run <script>` only when the user asks to publish. Publishing an existing graph id can overwrite the server document.
+- Bound scripts with active loops using the duration option supported by the installed CLI.
 
-- Top-level `label` is the diagram title.
-- Top-level `description` is the diagram description.
-- Node `label` is the node title.
-- Node `attributes.description` is the node description field.
-- The node tree is under top-level `root`.
+## References
 
-## Validation and publishing safety
+Read only what the task needs:
 
-- Inspect `schematify dry-run --help` and `schematify run --help` before relying on flags.
-- Validate scripts with `schematify dry-run <script>` first; dry-run performs no server writes.
-- `schematify run <script>` publishes to the server. Only run it when the user asks to publish/update remotely.
-- Bound looping scripts with `--max-duration` when validating or publishing.
-
-## Lazy references
-
-Read only when needed:
-
-- Node type ids and status badges: [references/node-types.md](references/node-types.md)
-- Exact builder methods and sandbox globals: [references/api-reference.md](references/api-reference.md)
-- Channel publishing, dry-run/publish behavior, and loops: [references/channels-publishing.md](references/channels-publishing.md)
-- Minimal runnable script: [examples/minimal.ts](examples/minimal.ts)
+- Builder methods and sandbox globals: [references/api-reference.md](references/api-reference.md)
+- Node types and status badge ids: [references/node-types.md](references/node-types.md)
+- Live channels, publishing, and loops: [references/channels-publishing.md](references/channels-publishing.md)
+- Relational database schemas: [references/database-schema.md](references/database-schema.md)
+- Minimal static script: [examples/minimal.ts](examples/minimal.ts)

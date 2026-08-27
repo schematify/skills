@@ -1,40 +1,40 @@
 ---
 name: schematify-generate
-description: Generate Schematify graph scripts from a codebase, directory, dataset, or described system. Use when the user wants a Schematify graph derived from source material rather than editing an existing graph script.
+description: Generate Schematify graph scripts from a codebase, directory, dataset, or described system. Use when the user wants a graph derived from source material rather than an edit to an existing graph script.
 ---
 
-# Schematify Generate
+# Schematify generate
 
-Use this skill to derive a Schematify graph from source material. Any graph output must be a Schematify graph script; do not use alternative graph formats.
+Use this skill to decide what a source-derived graph should contain. The output is always a Schematify TypeScript graph script, not Mermaid, DOT, or another graph format.
 
-## Source-first analysis
+## Workflow
 
-This skill guides how to turn analyzed source material into a Schematify graph. It does not replace normal codebase, dataset, or domain analysis.
+1. Inspect the source material before writing graph code.
+2. Identify the important entities, containment, responsibilities, and relationships.
+3. Ground important nodes and links in evidence such as files, imports, routes, configuration, schemas, service calls, data models, APIs, documentation, or structured records.
+4. Form a brief graph model before authoring the script.
+5. Use **schematify-graphs** to implement and validate that model.
 
-When deriving a graph from a codebase, directory, dataset, or described system:
+Mark important inferred relationships as inferred when the source does not establish them directly.
 
-1. Inspect the source material first, independently of Schematify.
-2. Identify the important entities, boundaries, responsibilities, and relationships.
-3. Ground nodes and links in observed evidence where possible, such as files, imports, routes, configuration, schemas, service calls, data models, queues, APIs, documentation, or structured records.
-4. Build a conceptual graph model before writing Schematify code.
-5. Then translate that model into a Schematify graph script using `schematify-graphs`.
+## Choose the graph kind
 
-Schematify is the target representation and publishing workflow; source inspection and architectural reasoning still come from the agent's normal analysis of the material.
+- **Architecture:** Logical components and major relationships.
+- **Code dependency:** Source files and resolved internal imports.
+- **File structure:** Directories and files nested by containment.
+- **Custom data:** Entities, hierarchy, and links from structured data or a user description.
 
-Pick the generation mode:
-
-- **Architecture** — logical components and major relationships.
-- **Code dependency** — source files and resolved internal imports.
-- **File structure** — directories/files nested by containment.
-- **Custom data** — user/data-defined entities, hierarchy, and links.
-
-Read the matching reference:
+Read only the matching reference:
 
 - Architecture: [references/architecture.md](references/architecture.md)
 - Code dependency: [references/dependency.md](references/dependency.md)
 - File structure: [references/file-structure.md](references/file-structure.md)
 - Custom data: [references/generic.md](references/generic.md)
 
-After source-first analysis, produce a plan: nodes with ids, labels, types, descriptions, hierarchy, and links as source → target paths. Important nodes and links should be grounded in inspected source material or clearly identified as inferred. The graph already has an implicit root; do not add a redundant top-level root node.
+## Before authoring
 
-Then use `schematify-graphs` to author and validate the TypeScript script. Load `schematify-render` if any node uses `.render(...)`. Even when reading JSON sources or examples, write new graph outputs as TypeScript. Validate with `schematify dry-run <script>` first. Publish with `schematify run <script>` only on explicit user instruction.
+The graph model should identify node ids, labels, types, descriptions, hierarchy, and root-relative link targets. Keep this as working material unless showing the plan would help the user.
+
+`graph(...).children(...)` already provides the document root. Do not add a redundant node that repeats the graph title merely to act as a root.
+
+Use **schematify-render** only when a node needs `.render(...)`. Validate with `schematify dry-run <script>`. Publish with `schematify run <script>` only when the user asks.

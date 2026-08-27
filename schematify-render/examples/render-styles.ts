@@ -1,3 +1,5 @@
+// Replace the UUID before creating a new graph.
+
 async function main() {
   const doc = graph("8e6f17dc-8b95-4ef6-9b02-61c08e8e40d0")
     .label("Render styles")
@@ -16,7 +18,7 @@ async function main() {
             header: from.value("P99 latency"),
             "display-value": from.attribute("latency_p99"),
           },
-          scale: { x: 1.5, y: 1.2 },
+          scale: { x: 2.5, y: 1.35 },
         }),
 
       node("report")

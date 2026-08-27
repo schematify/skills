@@ -1,25 +1,23 @@
-# Code Dependency
+# Code dependency
 
-Generate a file-level dependency graph: source files as nodes, resolved internal imports as links.
+Generate a file-level dependency graph. Source files become nodes and resolved internal imports become directional links.
 
-## Recon
+## What to inspect
 
-Inspect the target for:
+Inspect:
 
-- source files
-- import/require/include statements
-- path aliases and module resolution config
-- entry points, if useful for graph layout/context
+- source files,
+- import, require, and include statements,
+- path aliases and module-resolution configuration,
+- entry points when they help explain the graph.
 
-Ignore external packages, generated/vendor/build directories, lock files, and unrelated assets unless imported by source.
+Ignore external packages, generated and vendor directories, build output, lock files, and unrelated assets unless source code imports them.
 
-## Plan
+## Graph model
 
-- **Nodes:** one per source file, plus directory containers.
-- **IDs:** relative paths from project root: `src/utils/auth.ts`; directories use their path.
-- **Labels:** filename for files; directory name for containers.
-- **Hierarchy:** directories/files nested via `.children([...])`.
-- **Links:** every resolved internal import, source file → target file path.
-- Resolve aliases and directory indexes before linking.
-
-Return the node/link plan to `schematify-generate` for graph authoring.
+- **Nodes:** One per source file, nested inside directory nodes.
+- **IDs:** Use one path segment per hierarchy level. For `src/utils/auth.ts`, use sibling ids `src`, `utils`, and `auth.ts`. Nesting produces the root-relative graph path `src/utils/auth.ts`.
+- **Labels:** Use the filename for files and directory name for containers.
+- **Hierarchy:** Match source directory containment with `.children([...])`.
+- **Links:** Include every resolved internal import. Link the importing file to the imported file using its root-relative graph path.
+- **Resolution:** Resolve aliases, extension rules, and directory indexes before creating links.

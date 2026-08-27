@@ -1,27 +1,25 @@
-# Custom Data
+# Custom data
 
-Generate a graph from user-described entities or structured data such as CSV, JSON, API output, org charts, process flows, or domain models.
+Generate a graph from structured data or a user-described system. Sources may include CSV, JSON, API output, org charts, process flows, and domain models.
 
-## Recon
+## What to establish
 
 Identify or ask for:
 
-- **Node unit:** the repeated entity instance.
-- **Hierarchy:** containment/grouping, if any.
-- **Links:** directed relationships between nodes.
-- **IDs:** stable unique keys, at least among siblings.
-- **Labels/types/attributes:** display fields and metadata.
-- **Channels:** only values expected to update live; omit for static domain/data diagrams.
+- the repeated entity that becomes a node,
+- containment or grouping,
+- directional relationships,
+- stable ids unique among siblings,
+- labels, node types, and useful metadata,
+- values that must update after publication.
 
-For structured data, read/fetch the source and map records to nodes and links. For verbal descriptions, use the given entities/relationships or ask for the missing list.
+Read or fetch structured input before mapping its records. For a verbal description, use the named entities and relationships. Ask only for information required to build a coherent graph.
 
-## Plan
+## Graph model
 
-- **Nodes:** one per entity instance, grouped if useful.
-- **Hierarchy:** nested `.children([...])`.
-- **Links:** source → target paths.
-- **Attributes:** static metadata.
-- **Channels:** live/updating values only; do not add status/metric channels to static diagrams.
-- **Types:** use fitting texture-pack ids when known; otherwise generic types.
-
-Return the node/link/channel plan to `schematify-generate` for graph authoring.
+- **Nodes:** Create one per entity and group them when grouping adds meaning.
+- **Hierarchy:** Represent containment with nested `.children([...])`.
+- **Links:** Connect source nodes to root-relative target paths.
+- **Attributes:** Store static metadata.
+- **Channels:** Use channels only for values expected to change after publication.
+- **Types:** Use a known node type when it fits, otherwise use a generic type.

@@ -1,21 +1,17 @@
-# File Structure
+# File structure
 
-Generate the directory tree as a graph. Containment is the structure; links are usually absent.
+Generate a directory tree as a graph. Parent-child containment carries the meaning, so links are usually unnecessary.
 
-## Recon
+## What to inspect
 
-Walk the target directory and capture files/directories with relative paths and parent/child containment.
+Walk the requested directory and record files and directories with their parent-child relationships. Ignore generated, vendor, and build directories by default. Honor any requested depth and include or exclude rules.
 
-Ignore generated/vendor/build directories by default. Honor user-specified depth or include/exclude rules.
+## Graph model
 
-## Plan
+- **Nodes:** One per directory and file.
+- **IDs:** Use the basename at each hierarchy level. For `src/utils/auth.ts`, use sibling ids `src`, `utils`, and `auth.ts`. Nesting produces the root-relative graph path `src/utils/auth.ts`.
+- **Labels:** Use the basename and keep file extensions.
+- **Hierarchy:** Nest every entry under its parent with `.children([...])`.
+- **Links:** Add none unless the user asks for another relationship, such as imports.
 
-- **Nodes:** one per directory and file.
-- **IDs:** relative paths from the root: `src/utils/auth.ts`.
-- **Labels:** basename; keep extensions for files.
-- **Hierarchy:** nest entries inside parent directories via `.children([...])`.
-- **Links:** none unless the user explicitly asks for an overlay such as imports.
-
-For huge trees, use the requested scope or a sensible bounded scope and state what was included.
-
-Return the node plan to `schematify-generate` for graph authoring.
+For a large tree, use the requested scope or choose a clear bounded scope and state what was included.

@@ -1,50 +1,61 @@
 ---
 name: schematify-cli
-description: Operate the schematify CLI for schematify resources — graphs, schemas, diagrams, documents (list, push, pull, delete, publish, generate). Run the CLI rather than searching the filesystem.
+description: Operate the Schematify CLI for published resources and command discovery. Use local TypeScript graph scripts when creating or editing source-authored graphs.
 ---
 
 # Schematify CLI
 
-`schematify` is a self-contained compiled binary (closed source — not an npm package, never in `node_modules`). It is the source of truth for schematify resources: query it rather than grepping the filesystem or codebase. If it is not on PATH, tell the user it is not installed and ask how to proceed.
+`schematify` is a compiled binary, not an npm package or a dependency in `node_modules`. If it is not on `PATH`, tell the user it is unavailable and stop rather than guessing another interface.
 
-Discover commands and flags from the CLI's own help — never guess. If a flag isn't in `--help`, it doesn't exist.
+Discover commands and flags from the installed CLI help:
 
 ```bash
 schematify --help
 schematify <command> --help
 ```
 
-- `--json` — use whenever you need to parse output. Emits structured JSON and suppresses spinners/colors/hints; errors become `{ "error": "...", "details": "..." }` on stdout.
-- Action commands (push, delete, publish) report success via exit code: 0 = ok, 1 = fail.
+If a flag is absent from `--help`, do not invent it.
 
-## Lightweight inspection/listing
+- Use `--json` when output needs parsing. It suppresses presentation output and returns structured errors on stdout.
+- Action commands such as push, delete, and publish report success through their exit code. Zero means success.
 
-### Ambiguous overview requests
+## Local source and published state
 
-For ambiguous requests such as "check my schematify diagrams", "show my graphs", or "what diagrams do I have?", do not pull resources by default.
+A graph can have two editable representations:
 
-Run `schematify list --json` and summarize the returned inventory using only list metadata: label, id/reference, and modified date if present.
+- A local TypeScript graph script used to generate and publish the graph.
+- A JSON graph document stored on the Schematify server, which can also be edited independently.
 
-Then ask what the user wants to do next, for example: validate, summarize, inspect structure, find broken links, view descriptions, or update a selected diagram.
+For source-authored work, use the TypeScript script as the authoring source and follow `script -> dry-run -> run`. Do not pull another published graph to infer how to edit an existing local script.
 
-Pull a document only when the user:
+The server is authoritative for its current published state. Publishing a script with an existing graph id can overwrite server-side edits. When the task involves reconciling remote changes, pull that specific graph and compare it with the local source before publishing. Do not perform this reconciliation merely to find examples.
 
-- selects a specific resource for deeper inspection,
-- asks for fields not available from `list`, such as top-level `description`,
-- asks for validation,
-- asks for internals such as nodes, links, channels, or paths,
-- asks for issues or broken references,
-- asks to edit/update/publish.
+## Inspect published resources
 
-When a document is pulled, use the **schematify-graphs** skill for graph/document structure semantics. In pulled documents, the diagram title is the top-level `label`, and the diagram description is the top-level `description`.
+For an overview such as "show my diagrams", run:
 
-For node/path/link/channel structure, use the **schematify-graphs** skill rather than inferring semantics only from ad-hoc JSON scans.
+```bash
+schematify list --json
+```
 
-## Authoring graphs
+Summarize the inventory using its label, id or reference, and modified date when present. Do not pull every resource by default.
 
-Graphs are written as TypeScript. Use **schematify-graphs** for graph structure, **schematify-render** for `.render(...)` styles and params, and **schematify-generate** to derive a graph from a codebase or dataset.
+Pull a specific document when the user:
 
-Validate without server writes first:
+- selects it for deeper inspection,
+- asks for fields absent from the list output,
+- asks to inspect nodes, links, channels, descriptions, or graph paths,
+- asks to validate or diagnose the published document,
+- asks to edit a published graph that has no local source script,
+- asks to compare published state with local source.
+
+Use **schematify-graphs** when interpreting a pulled graph document. Its top-level `label` is the diagram title, its top-level `description` describes the diagram, and its node tree is under `root`.
+
+## Author graph scripts
+
+Use **schematify-graphs** for graph structure, **schematify-render** for `.render(...)`, and **schematify-generate** when deriving a graph from source material.
+
+Validate without server writes:
 
 ```bash
 schematify dry-run <script>
@@ -56,4 +67,4 @@ Publish only when requested:
 schematify run <script>
 ```
 
-`run` writes to the server; `dry-run` does not.
+`run` writes to the server. `dry-run` does not.

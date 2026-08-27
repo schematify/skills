@@ -1,110 +1,99 @@
 # Node types and status badges
 
-Use `.type("pack/id")` to choose node visuals. Prefer these real pack ids over generic `base/default`.
+`.type("pack/id")` selects a node's visual texture. It does not add behavior or validate the node's meaning. Prefer a documented type that matches the concept, then use `base/default` as the fallback.
 
-## Base node types
+## Base
 
-- `base/default` — generic fallback when no better type fits.
-- `base/collection` — grouping/container node.
-- `base/configuration` — config/settings/env/secrets-ish node.
+- `base/default`: Generic fallback.
+- `base/collection`: Group or container.
+- `base/configuration`: Configuration, settings, environment, or secrets.
 
-## Actor node types
+## Actors
 
-- `actors/user` — single end user/person.
-- `actors/admin` — administrator/operator.
-- `actors/actor` — generic external/internal actor.
-- `actors/guest` — unauthenticated/guest user.
-- `actors/external-user` — external user/customer/partner.
-- `actors/users` — user group/audience.
-- `actors/service-account` — bot, machine user, or service principal.
+- `actors/user`: One end user.
+- `actors/admin`: Administrator or operator.
+- `actors/actor`: Generic actor.
+- `actors/guest`: Unauthenticated user.
+- `actors/external-user`: Customer, partner, or other external user.
+- `actors/users`: User group or audience.
+- `actors/service-account`: Bot, machine user, or service principal.
 
-## Compute node types
+## Compute
 
-- `compute/server` — physical/virtual server or host.
-- `compute/cpu` — CPU/processor resource.
-- `compute/memory` — RAM/memory resource.
-- `compute/storage` — disk/block/object storage resource.
-- `compute/container` — generic container.
-- `compute/instance` — VM/cloud instance.
-- `compute/cluster` — compute/Kubernetes/server cluster.
-- `compute/function` — serverless function/job.
-- `compute/docker` — Docker runtime/containerization.
-- `compute/kubernetes` — Kubernetes cluster/workload.
-- `compute/terraform` — Terraform/IaC configuration.
-- `compute/nginx` — NGINX web server/proxy.
+- `compute/server`: Physical or virtual host.
+- `compute/cpu`: Processor resource.
+- `compute/memory`: Memory resource.
+- `compute/storage`: Disk, block, or object storage.
+- `compute/container`: Generic container.
+- `compute/instance`: Virtual machine or cloud instance.
+- `compute/cluster`: Compute, Kubernetes, or server cluster.
+- `compute/function`: Serverless function or job.
+- `compute/docker`: Docker runtime or containerization.
+- `compute/kubernetes`: Kubernetes cluster or workload.
+- `compute/terraform`: Terraform configuration.
+- `compute/nginx`: NGINX server or proxy.
 
-## Network node types
+## Network
 
-- `network/firewall` — firewall/security boundary.
-- `network/router` — router/network route point.
-- `network/dns` — DNS service/record set.
-- `network/cdn` — CDN/edge cache.
-- `network/vpn` — VPN tunnel/gateway.
-- `network/internet` — public internet/external network.
-- `network/nat-gateway` — NAT gateway/egress.
-- `network/proxy` — proxy/reverse proxy.
+- `network/firewall`: Firewall or security control.
+- `network/router`: Router or route point.
+- `network/dns`: DNS service or record set.
+- `network/cdn`: CDN or edge cache.
+- `network/vpn`: VPN tunnel or gateway.
+- `network/internet`: Public internet.
+- `network/nat-gateway`: NAT gateway or egress.
+- `network/proxy`: Forward or reverse proxy.
 
-## Filesystem node types
+## Filesystem
 
-- `filesystem/directory` — folder/package/module container.
-- `filesystem/file` — generic file.
-- `filesystem/source-code` — source code file.
-- `filesystem/document` — docs/markdown/text/spec files.
-- `filesystem/archive` — zip/tar/package artifact.
-- `filesystem/executable` — scripts/binaries/commands.
-- `filesystem/image` — image asset.
-- `filesystem/audio` — audio asset.
-- `filesystem/video` — video asset.
+- `filesystem/directory`: Directory, package, or module container.
+- `filesystem/file`: Generic file.
+- `filesystem/source-code`: Source code file.
+- `filesystem/document`: Documentation, text, or specification file.
+- `filesystem/archive`: Package or archive file.
+- `filesystem/executable`: Script, binary, or command.
+- `filesystem/image`: Image asset.
+- `filesystem/audio`: Audio asset.
+- `filesystem/video`: Video asset.
 
-## Microservices node types
+## Microservices
 
-- `microservices/service` — app, service, worker, backend, frontend app.
-- `microservices/subsystem` — bounded context, package group, platform area.
-- `microservices/endpoint` — API route, HTTP/RPC endpoint.
-- `microservices/load-balancer` — gateway, ingress, load balancer.
-- `microservices/message-queue` — generic queue/broker.
-- `microservices/kafka` — Kafka cluster/broker.
-- `microservices/topic` — Kafka/event topic.
-- `microservices/cache` — cache layer/service.
+- `microservices/service`: Application, service, worker, backend, or frontend.
+- `microservices/subsystem`: Bounded context, package group, or platform area.
+- `microservices/endpoint`: HTTP, RPC, or another API endpoint.
+- `microservices/load-balancer`: Gateway, ingress, or load balancer.
+- `microservices/message-queue`: Queue or message broker.
+- `microservices/kafka`: Kafka cluster or broker.
+- `microservices/topic`: Event or Kafka topic.
+- `microservices/cache`: Cache service.
 
-## Database node types
+## Databases
 
-- `databases/default` — generic database/storage.
-- `databases/postgres` — PostgreSQL.
-- `databases/mysql` — MySQL.
-- `databases/mongodb` — MongoDB/document store.
-- `databases/redis` — Redis/cache store.
-- `databases/prometheus` — Prometheus/metrics store.
-- `databases/table` — database table/collection when modeling schema internals.
-- `databases/view` — database view.
-- `databases/stored_procedure` — stored procedure/function.
+- `databases/default`: Generic database or data store.
+- `databases/postgres`: PostgreSQL.
+- `databases/mysql`: MySQL.
+- `databases/mongodb`: MongoDB or another document store.
+- `databases/redis`: Redis.
+- `databases/prometheus`: Prometheus.
+- `databases/table`: Database table or collection.
+- `databases/view`: Database view.
+- `databases/stored_procedure`: Stored procedure or function.
 
-## Country flag node types
+## Country flags
 
-Use `country-flags/<iso-code>` for flag icons. The pack contains two-letter country/territory codes from the current public pack, plus `country-flags/gb-sct` for Scotland. Examples:
-
-- `country-flags/us` — United States.
-- `country-flags/gb` — United Kingdom.
-- `country-flags/gb-sct` — Scotland.
-- `country-flags/de` — Germany.
-- `country-flags/fr` — France.
-- `country-flags/jp` — Japan.
-
-## Empty packs
-
-These packs currently exist but define no node types: `aws`, `schematify`.
+Use `country-flags/<iso-code>` when geography is part of the graph. For example, `country-flags/us` represents the United States.
 
 ## Status badges
 
-Status badge ids are separate from node type ids. Use them in `.status({ type: ... })`, commonly via a channel value.
+Status badge ids are separate from node type ids. Use them in `.status({ type: ... })`, often through `from.channel("status")`.
 
-- `base/default` — default/unknown status badge.
-- `base/critical` — critical, bubbles up, fixed, bouncing badge.
-- `base/alert` — alert, bubbles up, fixed, bouncing badge.
-- `base/warning` — warning, bubbles up, fixed badge.
-- `base/info` — informational fixed badge.
-- `base/maintenance` — maintenance fixed pulsing badge.
-- `base/healthy` — healthy/OK badge.
-- `base/unknown` — unknown badge.
+- `base/default`: Default status.
+- `base/critical`: Critical failure.
+- `base/alert`: Active alert.
+- `base/warning`: Warning.
+- `base/info`: Informational state.
+- `base/maintenance`: Maintenance state.
+- `base/healthy`: Healthy state.
+- `base/unknown`: Unknown state.
 
-Render styles are separate from node types. Use the **schematify-render** skill for `.render(...)`, style-specific params, bindings, and sizing.
+Use **schematify-render** for property, report, and chart presentation.
