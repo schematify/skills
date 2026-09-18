@@ -58,7 +58,7 @@ A node path joins its id to its ancestor ids. For example, node `routes` inside 
 | `.type(typeId)` | Select the node's visual type. It does not change graph behavior. |
 | `.attributes(obj)` | Store static key-value metadata. The `description` key becomes the node description. |
 | `.channels(channels)` | Define live value slots on this node. |
-| `.status(config)` | Bind a status badge, usually with `from.channel(...)`. |
+| `.status(config)` | Set the status `type` binding and optional `report` bindings with `from.channel(...)`, `from.attribute(...)`, or `from.value(...)`. |
 | `.render(config)` | Configure a specialized renderer. Load **schematify-render** first. |
 | `.links(paths)` | Link to root-relative node paths. Nested targets include every ancestor id. |
 | `.children(nodes)` | Add nested nodes. |
@@ -86,6 +86,23 @@ from.channel("status")
 from.attribute("region")
 from.value("Static text")
 ```
+
+A status report can mix live channel values with static attributes:
+
+```typescript
+node("db")
+  .attributes({ owner: "data-team" })
+  .channels([
+    channel("status").default("base/healthy"),
+    channel("connections").default(142),
+  ])
+  .status({
+    type: from.channel("status"),
+    report: [from.channel("connections"), from.attribute("owner")],
+  });
+```
+
+Each report binding resolves independently from its own source, so a channel binding does not need a duplicate attribute.
 
 ## `channelPublisher(graphId)`
 
