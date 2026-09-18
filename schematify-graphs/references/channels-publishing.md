@@ -75,4 +75,4 @@ async function main() {
 main();
 ```
 
-Use the installed CLI help to find its duration option. Bound loops during validation and one-off publishing so they cannot run indefinitely.
+Use the installed CLI help to find its duration option. Bound loops during validation and one-off publishing so they cannot run indefinitely. Allow enough time for startup, fetches, and the first `doc.publish()`; an earlier timeout can exit successfully without producing a document.

@@ -58,7 +58,7 @@ A node path joins its id to its ancestor ids. For example, node `routes` inside 
 | `.type(typeId)` | Select the node's visual type. It does not change graph behavior. |
 | `.attributes(obj)` | Store static key-value metadata. The `description` key becomes the node description. |
 | `.channels(channels)` | Define live value slots on this node. |
-| `.status(config)` | Bind a status badge, usually with `from.channel(...)`. |
+| `.status(config)` | Bind a status badge. `type` selects the badge and optional `report` bindings supply values for its hover panel. |
 | `.render(config)` | Configure a specialized renderer. Load **schematify-render** first. |
 | `.links(paths)` | Link to root-relative node paths. Nested targets include every ancestor id. |
 | `.children(nodes)` | Add nested nodes. |
@@ -86,6 +86,25 @@ from.channel("status")
 from.attribute("region")
 from.value("Static text")
 ```
+
+### Status badge hover reports
+
+A status `report` is an array of bindings displayed as rows when the badge is hovered:
+
+```typescript
+node("db")
+  .attributes({ owner: "data-team" })
+  .channels([
+    channel("status").default("base/healthy"),
+    channel("connections").default(142),
+  ])
+  .status({
+    type: from.channel("status"),
+    report: [from.channel("connections"), from.attribute("owner")],
+  });
+```
+
+Each report binding resolves independently from its channel, attribute, or literal source. Channel and attribute rows are labelled with the binding key, not the channel label. A channel binding does not require a matching attribute, and publisher updates refresh its hover value.
 
 ## `channelPublisher(graphId)`
 
