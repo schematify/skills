@@ -1,6 +1,6 @@
 ---
 name: schematify-graphs
-description: Edit or author Schematify TypeScript graph scripts with the graph, node, and channel builder API. Use for graph structure, links, live values, and updates to existing source scripts.
+description: Edit or author Schematify TypeScript graph scripts with the graph, node, and channel builder API. Use for graph structure, links, live values, requested timeline recording, and updates to existing source scripts.
 ---
 
 # Schematify graphs
@@ -52,6 +52,18 @@ For a static graph:
 Live data means a value can change after the graph document is published. Define a `channel(...)` on the node, then use `channelPublisher(doc.id)` to send replacement values to that channel. A status or render parameter can read the current value with `from.channel(...)`. Channel updates change values, not graph structure.
 
 Use live data only when the user asks for monitoring, telemetry, status updates, polling, or another ongoing update flow. Read [references/channels-publishing.md](references/channels-publishing.md) before implementing it.
+
+## Timeline recording (opt-in)
+
+Add timeline recording only when the user requests retained history, historical snapshots,
+or timeline events/conditions. Live monitoring alone does not imply recording.
+Timeline is experimental: tell viewers to enable **Enable experimental features** in
+client **Settings**. That browser preference is off by default; recording requires only
+the script opt-in, with no additional CLI flag.
+Read [references/timeline.md](references/timeline.md) for the exact APIs and lifecycle;
+use [examples/timeline.ts](examples/timeline.ts) as a small runnable example.
+The CLI runner owns recording and review delivery; do not implement a custom database,
+action listener, or snapshot transport inside the user's script.
 
 ## Specialized rendering
 

@@ -68,3 +68,21 @@ schematify run <script>
 ```
 
 `run` writes to the server. `dry-run` does not.
+
+## Timeline scripts
+
+Timeline is experimental. To view recorded history, enable **Enable experimental
+features** in the client's **Settings**. There is no additional CLI experimental flag;
+the script opts in with `.enableTimeline(...)`. The UI setting does not stop recording.
+
+When timeline recording is requested, use **schematify-graphs** and its timeline
+reference. Use a CLI and server build that support the feature; an older CLI can
+support `run` while lacking `.enableTimeline(...)`. There is no separate timeline
+command or `--timeline` flag.
+
+Check `schematify config show` before a requested run against a particular instance.
+Keep the runner alive while the user reviews history: SQLite and snapshot responses
+live in the runner, not in the browser. Use `--max-duration` when a bounded run is
+wanted. Dry-run does not create history, subscribe to actions, or prove snapshot
+delivery. If an action subscription fails, values can still publish and record;
+successful publishing alone does not prove timeline review works.

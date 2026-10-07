@@ -54,6 +54,10 @@ Publishing a graph with an existing id can overwrite the server document.
 
 ## Polling loops
 
+For requested historical recording, read [timeline.md](timeline.md). Timeline is an
+explicit opt-in on the publisher; ordinary channel publishing does not retain history.
+Events and conditions are registered on channel builders and evaluated on sent values.
+
 An active interval keeps the script running:
 
 ```typescript
