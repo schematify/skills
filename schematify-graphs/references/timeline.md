@@ -69,6 +69,8 @@ the graph, and takes an options object, not a bare duration.
   stable graph/node/channel IDs, and avoid unnecessary graph republishes.
 - Rule functions remain in the script; pulling the published JSON cannot recover them.
 
+For recurring sends, follow the awaited loop in [channels-publishing.md](channels-publishing.md#polling-loops). Network delays slow the observation rate; this is not a fixed-frequency recorder independent of delivery.
+
 ## Running and reviewing
 
 See [../examples/timeline.ts](../examples/timeline.ts) for a runnable synthetic demo.

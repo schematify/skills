@@ -51,6 +51,8 @@ For a static graph:
 
 Live data means a value can change after the graph document is published. Define a `channel(...)` on the node, then use `channelPublisher(doc.id)` to send replacement values to that channel. A status or render parameter can read the current value with `from.channel(...)`. Channel updates change values, not graph structure.
 
+For recurring publishes, use one awaited loop: read values, `.set(...)`, `await .send()`, then await a timer. Do not use `setInterval(async ...)` for publishing; it starts overlapping callbacks.
+
 Use live data only when the user asks for monitoring, telemetry, status updates, polling, or another ongoing update flow. Read [references/channels-publishing.md](references/channels-publishing.md) before implementing it.
 
 ## Timeline recording (opt-in)

@@ -17,14 +17,12 @@ async function main() {
   const samples = [40, 95, 96, 60];
   let index = 0;
 
-  async function tick() {
+  while (true) {
     pub.set("api", { cpu: samples[index % samples.length] });
     await pub.send();
     index += 1;
-    setTimeout(() => { void tick().catch(error => console.error(error)); }, 2000);
+    await new Promise<void>(resolve => setTimeout(resolve, 2000));
   }
-
-  await tick();
 }
 
 void main();
