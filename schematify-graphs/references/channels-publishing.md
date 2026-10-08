@@ -54,22 +54,39 @@ Publishing a graph with an existing id can overwrite the server document.
 
 ## Polling loops
 
-An active interval keeps the script running:
+For requested historical recording, read [timeline.md](timeline.md). Timeline is an
+explicit opt-in on the publisher; ordinary channel publishing does not retain history.
+Events and conditions are registered on channel builders and evaluated on sent values.
+
+For polling, await each send before scheduling the next iteration. `setInterval(async () => ...)` does not wait for its callback and can cause overlapping sends, which the
+publisher rejects. `set()` keeps only the latest pending value per node/channel;
+`send()` flushes a batch without creating a background queue.
+
+The delay is a pause **after** each iteration, so slow reads or sends reduce the sample
+rate. Timeline rules see sent observations; transitions between samples can be missed.
+CLI API requests and token refreshes each have a 30-second timeout, including response
+body reads. The single authentication retry can extend the total send time beyond
+30 seconds. Failed batches remain available for a later `send()`, with newer values
+replacing older pending values for the same channel.
+
+These minimal examples stop on a rejected operation. If a script retries temporary
+failures, catch them inside the loop and retain the delay; stop on configuration or
+authentication failures. Do not silently swallow every error or retry in a tight loop.
+
+Use one awaited loop so a slow send delays the next iteration:
 
 ```typescript
 async function main() {
   await doc.publish();
   const pub = channelPublisher(doc.id);
 
-  async function tick() {
+  while (true) {
     const response = await fetch("https://metrics.example/stats");
     const stats = await response.json();
     pub.set("server", { cpu: `${stats.cpu}%` });
     await pub.send();
+    await new Promise<void>(resolve => setTimeout(resolve, 5000));
   }
-
-  setInterval(tick, 5000);
-  await tick();
 }
 
 main();

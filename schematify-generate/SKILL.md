@@ -38,3 +38,7 @@ The graph model should identify node ids, labels, types, descriptions, hierarchy
 `graph(...).children(...)` already provides the document root. Do not add a redundant node that repeats the graph title merely to act as a root.
 
 Use **schematify-render** only when a node needs `.render(...)`. Validate with `schematify dry-run <script>`. Publish with `schematify run <script>` only when the user asks.
+
+Add retained history and timeline rules only when requested. Route that part through
+the **schematify-graphs** timeline reference; do not add recording automatically to
+generated monitoring graphs or invent a storage/transport layer in the script.

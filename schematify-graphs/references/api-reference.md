@@ -76,6 +76,8 @@ channel("cpu").label("CPU").default("N/A").staleAfter(5000)
 | `.label(name)` | Set the display name. It defaults to the channel id. |
 | `.default(value)` | Set the initial or fallback value. |
 | `.staleAfter(ms)` | Set this channel's staleness threshold. |
+| `.timelineEvent({ type, test })` | Register a point event when a synchronous boolean test becomes true; see [timeline](timeline.md). |
+| `.timelineCondition({ type, test })` | Register an observed duration while a synchronous boolean test is true; see [timeline](timeline.md). |
 
 ## `from`
 
@@ -118,6 +120,7 @@ await pub.send();
 |---|---|
 | `.set(nodePath, channels)` | Buffer channel values for a root-relative node path. Repeated calls merge keys. |
 | `.send()` | Send buffered values and clear the buffer after success. |
+| `.enableTimeline({ retentionMs })` | Opt in to local history and published graph capability; preferably configure before graph publication. Positive retention in milliseconds, at most 86,400,000 (one day). |
 
 ## Other globals
 
