@@ -33,7 +33,11 @@ Read only the matching reference:
 
 ## Before authoring
 
-The graph model should identify node ids, labels, types, descriptions, hierarchy, and root-relative link targets. Keep this as working material unless showing the plan would help the user.
+The graph model should identify node ids, labels, types, descriptions, hierarchy, root-relative link targets, and meaningful relationship labels. Keep this as working material unless showing the plan would help the user.
+
+For architecture, process, and custom-data graphs, generate edge labels that name the operation or payload established by the source: "reserves inventory", "publishes OrderPlaced", or "validates access token". Prefer a short verb and object over "calls", "reads", or "uses" alone. Follow the edge-label guidance in **schematify-graphs** for exact builder syntax and direction.
+
+Do not infer an operation from a node type: a database connection could read, write, or both, and a queue connection could publish or consume. Use existing authored labels when supplied. If the evidence establishes only a dependency, retain that fact without inventing a richer label. Pure import graphs usually need no repeated "imports" label; file trees need no extra links or labels for containment.
 
 `graph(...).children(...)` already provides the document root. Do not add a redundant node that repeats the graph title merely to act as a root.
 

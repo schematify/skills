@@ -67,6 +67,12 @@ use [examples/timeline.ts](examples/timeline.ts) as a small runnable example.
 The CLI runner owns recording and review delivery; do not implement a custom database,
 action listener, or snapshot transport inside the user's script.
 
+## Edge labels
+
+Use `.links([{ to: "data/orders", label: "writes order history" }])` for a labelled relationship; plain target strings remain valid for unlabelled links. The label describes what the source does with or sends to the target, rather than repeating node names or a generic "calls".
+
+Prefer a short, source-grounded verb and object. Omit a label when it adds no useful meaning or the relationship is unknown. Read [references/edge-labels.md](references/edge-labels.md) when authoring labelled links for wording, direction, and display behaviour. Labels are document content; the viewer chooses how to display them.
+
 ## Specialized rendering
 
 Use default rendering for ordinary nodes. Load **schematify-render** before using property, report, pie chart, bar chart, or line chart styles. That skill defines each style's parameters, bindings, and sizing behavior.
@@ -98,6 +104,7 @@ Use pulled JSON to inspect published state. Do not treat it as a replacement for
 Read only what the task needs:
 
 - Builder methods and sandbox globals: [references/api-reference.md](references/api-reference.md)
+- Relationship labels and direction: [references/edge-labels.md](references/edge-labels.md)
 - Node types and status badge ids: [references/node-types.md](references/node-types.md)
 - Live channels, publishing, and loops: [references/channels-publishing.md](references/channels-publishing.md)
 - Relational database schemas: [references/database-schema.md](references/database-schema.md)

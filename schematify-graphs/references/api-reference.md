@@ -60,10 +60,22 @@ A node path joins its id to its ancestor ids. For example, node `routes` inside 
 | `.channels(channels)` | Define live value slots on this node. |
 | `.status(config)` | Bind a status badge. `type` selects the badge and optional `report` bindings supply values for its hover panel. |
 | `.render(config)` | Configure a specialized renderer. Load **schematify-render** first. |
-| `.links(paths)` | Link to root-relative node paths. Nested targets include every ancestor id. |
+| `.links(targets)` | Link to root-relative node paths using strings or `{ to, label? }` objects. Nested targets include every ancestor id. |
 | `.children(nodes)` | Add nested nodes. |
 
 A node type id such as `microservices/service` selects a visual texture from a node type pack. Prefer documented ids over invented values.
+
+Labelled and unlabelled targets can be mixed:
+
+```typescript
+node("orders").links([
+  { to: "data/orders", label: "writes order history" },
+  { to: "events/bus", label: "publishes OrderPlaced" },
+  "shared/config",
+]);
+```
+
+The source is the declaring node's path; `to` is the target path. Compilation hoists links to `root.links`, generates ids, and uses `direction: "forwards"`. `label` is a top-level optional string on the compiled link. It is separate from `link-type` and node labels. Read [edge-labels.md](edge-labels.md) for authoring guidance and CLI compatibility.
 
 ## `channel(id)`
 
